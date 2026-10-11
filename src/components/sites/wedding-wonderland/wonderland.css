@@ -1,0 +1,283 @@
+/*
+ * Wedding Wonderland — scene transitions.
+ * The root `.wl` carries `data-phase` (intro | entering | scene) and `data-stage` (0 | 1, "the
+ * first scene has settled, show the UI"). Each section is a `.wl-scene` with its own
+ * `data-state` (future | dim | active | past) and its own scroll variable `--p` (0..1), written
+ * from JS. All timing lives here so React only flips attributes and writes `--p`.
+ */
+
+html:has(.wl),
+body:has(.wl) {
+  background: #000;
+}
+
+.wl {
+  --wl-ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --wl-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ---------- keyframes ---------- */
+
+@keyframes wl-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(0, -12px, 0) rotate(2.2deg);
+  }
+}
+
+@keyframes wl-swing {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes wl-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes wl-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes wl-nudge {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, 5px, 0);
+  }
+}
+
+@keyframes wl-copy-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- intro art ---------- */
+
+.wl-float {
+  animation: wl-float var(--dur, 9s) ease-in-out var(--delay, 0s) infinite;
+}
+
+.wl-swing {
+  animation: wl-swing 6.5s ease-in-out infinite;
+}
+
+/* `backwards` (not `both`) so the finished animation stops overriding the exit transform. */
+.wl-cutout {
+  animation: wl-pop 1.4s var(--wl-ease-out) var(--enter-delay, 0s) backwards;
+  transition:
+    transform 2s var(--wl-ease-in),
+    opacity 1.6s ease-in 0.1s;
+}
+
+.wl:not([data-phase="intro"]) .wl-cutout {
+  opacity: 0;
+  transform: translate3d(var(--fx, 0), var(--fy, 0), 0) scale(1.5);
+}
+
+/* ---------- intro text ---------- */
+
+.wl-intro-item {
+  animation: wl-rise 1.1s var(--wl-ease-out) var(--d, 0s) backwards;
+  transition: opacity 0.8s ease;
+}
+
+.wl:not([data-phase="intro"]) .wl-fade {
+  opacity: 0;
+}
+
+/* Camera push: the headline scales far past the viewport while it fades late. */
+.wl-title {
+  transform-origin: 50% 50%;
+  will-change: transform;
+  transition:
+    transform 3.3s var(--wl-ease-in),
+    opacity 1.4s ease 2s;
+}
+
+.wl:not([data-phase="intro"]) .wl-title {
+  transform: scale(10);
+  opacity: 0;
+}
+
+/* ---------- showpiece sections ---------- */
+
+/*
+ * Moving forward, the active section zooms past the viewer ("past") while the next one rises
+ * out of the distance ("future" -> "active"). Going back reverses it. `visibility` flips only
+ * after the fade so a hidden section never blocks input or paints.
+ */
+.wl-scene {
+  --p: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0.92);
+  transition:
+    opacity 1.6s ease,
+    transform 2.4s var(--wl-ease-out),
+    visibility 0s linear 1.6s;
+  will-change: transform, opacity;
+}
+
+/* During the Enter push the first section is already there, dim and slightly oversized. */
+.wl-scene[data-state="dim"] {
+  opacity: 0.3;
+  visibility: visible;
+  transform: scale(1.08);
+  transition:
+    opacity 3.2s ease 1.1s,
+    transform 3.2s ease 1.1s,
+    visibility 0s;
+}
+
+.wl-scene[data-state="active"] {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+  transition:
+    opacity 2.2s ease,
+    transform 2.6s var(--wl-ease-out),
+    visibility 0s;
+}
+
+.wl-scene[data-state="past"] {
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(1.35);
+  transition:
+    opacity 1.6s ease,
+    transform 2.4s var(--wl-ease-in),
+    visibility 0s linear 1.6s;
+}
+
+/* Parallax: each layer reads the section's `--p` at a different depth. */
+.wl-photo {
+  transform-origin: 50% 55%;
+  transform: translate3d(0, calc(var(--p) * -4%), 0) scale(calc(1.08 + var(--p) * 0.14));
+  will-change: transform;
+}
+
+.wl-fg {
+  transform: translate3d(0, calc(var(--p) * -90px), 0) rotate(calc(var(--p) * 6deg));
+  will-change: transform;
+}
+
+.wl-fg-deep {
+  transform: translate3d(0, calc(var(--p) * -220px), 0) scale(calc(1 + var(--p) * 0.18))
+    rotate(calc(var(--p) * -8deg));
+}
+
+.wl-copy {
+  transform: translate3d(0, calc(var(--p) * -48px), 0);
+}
+
+/* Keeps white type readable on any photo, light or dark. */
+.wl-scrim {
+  background:
+    linear-gradient(to top, rgba(0, 0, 0, 0.74) 0%, rgba(0, 0, 0, 0.3) 38%, transparent 64%),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.42), transparent 24%);
+}
+
+/* Copy lines rise in turn each time their section becomes active. */
+.wl-scene[data-state="active"] .wl-copy > * {
+  animation: wl-copy-in 1.2s var(--wl-ease-out) calc(1.1s + var(--i, 0) * 0.14s) backwards;
+}
+
+/* ---------- section dots ---------- */
+
+.wl-dot {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+}
+
+.wl-dot::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.45);
+  transition:
+    height 0.5s var(--wl-ease-out),
+    background-color 0.3s ease;
+}
+
+.wl-dot:hover::before {
+  background: #fff;
+}
+
+.wl-dot[aria-current="true"]::before {
+  height: 26px;
+  background: #fff;
+}
+
+/* ---------- UI that only exists once the first scene has settled ---------- */
+
+.wl-ui {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease 0.6s;
+}
+
+.wl[data-stage="1"] .wl-ui {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.wl[data-stage="1"] .wl-hint[data-end="true"] {
+  opacity: 0;
+  pointer-events: none;
+  transition-delay: 0s;
+}
+
+.wl-nudge {
+  animation: wl-nudge 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wl-float,
+  .wl-swing,
+  .wl-cutout,
+  .wl-intro-item,
+  .wl-nudge,
+  .wl-scene[data-state="active"] .wl-copy > * {
+    animation: none;
+  }
+
+  .wl *,
+  .wl *::before,
+  .wl *::after {
+    transition-duration: 0.01s !important;
+    transition-delay: 0s !important;
+  }
+}
