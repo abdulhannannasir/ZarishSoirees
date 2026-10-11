@@ -83,7 +83,6 @@ instead of snapping back to zero.
 
 ## Known gaps
 
-- Brand name is the placeholder "Your Studio" (`BRAND` in `content.ts`).
 - No contact / enquiry call to action yet; the site ends on the last section.
 - Placeholders are gradients, not photographs. Real photos will change how well the scrim holds:
   check very bright images (white linen, daylight) and raise the scrim in `wonderland.css` if needed.

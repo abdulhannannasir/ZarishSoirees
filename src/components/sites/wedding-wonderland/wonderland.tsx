@@ -51,6 +51,12 @@ const CUTOUTS: Cutout[] = [
 const pill =
   "inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/45 px-4 py-2 text-white backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
+/**
+ * On phones the two header buttons shrink to 44px icon buttons (their text stays for screen
+ * readers). That frees the middle of the header, so a longer brand name still fits between them.
+ */
+const iconOnlyOnPhones = "max-sm:size-11 max-sm:justify-center max-sm:px-0 max-sm:py-0";
+
 export function Wonderland() {
   const [phase, setPhase] = useState<Phase>("intro");
   const [stage, setStage] = useState<0 | 1>(0);
@@ -359,22 +365,22 @@ export function Wonderland() {
           type="button"
           onClick={goHome}
           inert={stage !== 1}
-          className={`wl-ui ${pill} font-label text-[11px] uppercase tracking-[0.15em]`}
+          className={`wl-ui ${pill} font-label text-[11px] uppercase tracking-[0.15em] ${iconOnlyOnPhones}`}
         >
-          <ChevronLeft className="size-3" aria-hidden="true" />
-          {UI.home}
+          <ChevronLeft className="size-3 max-sm:size-4" aria-hidden="true" />
+          <span className="max-sm:sr-only">{UI.home}</span>
         </button>
-        <span className="pointer-events-none absolute left-1/2 top-[clamp(18px,3.2vw,30px)] -translate-x-1/2 whitespace-nowrap font-label text-base font-light tracking-[0.45em] [text-shadow:0_1px_14px_rgba(0,0,0,0.6)]">
+        <span className="pointer-events-none absolute left-1/2 top-[clamp(18px,3.2vw,30px)] -translate-x-1/2 whitespace-nowrap font-label text-sm font-light tracking-[0.32em] [text-shadow:0_1px_14px_rgba(0,0,0,0.6)] max-sm:top-7 sm:text-base sm:tracking-[0.45em]">
           {BRAND.wordmark}
         </span>
         <button
           type="button"
           onClick={() => setBoardOpen(true)}
           inert={stage !== 1}
-          className={`wl-ui ${pill} font-label text-sm`}
+          className={`wl-ui ${pill} font-label text-sm ${iconOnlyOnPhones}`}
         >
-          <LayoutGrid className="size-3.5" aria-hidden="true" />
-          {UI.moodboard}
+          <LayoutGrid className="size-3.5 max-sm:size-4" aria-hidden="true" />
+          <span className="max-sm:sr-only">{UI.moodboard}</span>
         </button>
       </header>
 

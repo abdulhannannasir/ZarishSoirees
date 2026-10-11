@@ -49,9 +49,9 @@ export type Section = {
 };
 
 export const BRAND = {
-  name: "Your Studio",
+  name: "Zarish Soirées",
   /** Shown top-centre. Lowercase looks best with the wide letter-spacing. */
-  wordmark: "your studio",
+  wordmark: "zarish soirées",
 } as const;
 
 export const HERO = {
