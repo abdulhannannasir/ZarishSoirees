@@ -22,7 +22,8 @@ export function Photo({ photo, priority = false }: { photo: PhotoSpec; priority?
   const mobile = getImageProps({ ...common, src: photo.mobileSrc });
   return (
     <picture>
-      <source media="(max-width: 767px)" srcSet={mobile.props.srcSet} />
+      {/* Unoptimized images (development, see next.config.ts) have no srcSet: use the plain src. */}
+      <source media="(max-width: 767px)" srcSet={mobile.props.srcSet ?? mobile.props.src} />
       <img {...desktop.props} alt={photo.alt} style={style} />
     </picture>
   );

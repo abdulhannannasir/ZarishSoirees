@@ -81,6 +81,21 @@ instead of snapping back to zero.
 - Copy sits bottom-left over a dark gradient: keep that corner calm. The placeholders draw this
   zone, the safe box, the filename and the recommended size on themselves.
 
+## Images in development vs production
+
+- `next dev` serves photos from `/public` as plain files (`images.unoptimized` in
+  `next.config.ts`). Swap a photo under the same filename and a normal reload shows it: there is no
+  image cache to clear. The cost is that dev loads your originals at full size, so a set of large
+  photos makes the dev page heavier. That does not affect production.
+- `next build` / production optimizes every image (responsive sizes, WebP) and caches the results
+  for 4 hours (`minimumCacheTTL`, Next's default). A self-hosted server with a persistent cache
+  folder therefore keeps showing an old photo for up to 4 hours after a swap unless
+  `<distDir>/cache/images` is deleted. A fresh deployment starts with an empty cache.
+- Why not just `minimumCacheTTL: 0` in dev? Next serves a stale cached image once while it
+  re-optimizes in the background, so the first reload after a swap would still show the old photo.
+- Optimizer-specific problems (an unsupported format, a missing file hidden by the cache) only show
+  up in a production build, so check one before launch.
+
 ## Known gaps
 
 - No contact / enquiry call to action yet; the site ends on the last section.
