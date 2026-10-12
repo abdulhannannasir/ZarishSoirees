@@ -264,6 +264,71 @@ body:has(.wl) {
   animation: wl-nudge 1.8s ease-in-out infinite;
 }
 
+/* ---------- finale (scene 6) ---------- */
+
+/* A dark stage with warm light bottom-left and a rose glow top-right, like the hero. */
+.wl-finale-stage {
+  background:
+    radial-gradient(ellipse at 18% 88%, rgba(217, 164, 65, 0.16), transparent 52%),
+    radial-gradient(ellipse at 88% 8%, rgba(232, 69, 123, 0.12), transparent 50%), #050508;
+}
+
+/* The portrait drifts and zooms a little less than the showpiece photos do. */
+.wl-portrait-photo {
+  transform-origin: 50% 45%;
+  transform: translate3d(0, calc(var(--p) * -2.5%), 0) scale(calc(1.03 + var(--p) * 0.07));
+  will-change: transform;
+}
+
+/* Phones: the portrait is full-bleed, so its lower half is darkened for the copy and buttons. */
+.wl-scrim-finale {
+  background:
+    linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.94) 0%,
+      rgba(0, 0, 0, 0.86) 34%,
+      rgba(0, 0, 0, 0.35) 62%,
+      transparent 82%
+    ),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.4), transparent 18%);
+}
+
+/* The primary call to action: champagne gold, with a slow sheen across it on hover. */
+.wl-gold {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f6e3b4 0%, #d9a441 52%, #efd08a 100%);
+  color: #1a1208;
+  text-shadow: none;
+  box-shadow:
+    0 12px 34px -10px rgba(217, 164, 65, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  transition:
+    transform 0.3s var(--wl-ease-out),
+    box-shadow 0.3s ease;
+}
+
+.wl-gold::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 32%, rgba(255, 255, 255, 0.6) 50%, transparent 68%);
+  transform: translateX(-130%);
+  transition: transform 0.9s ease;
+  pointer-events: none;
+}
+
+.wl-gold:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 16px 40px -10px rgba(217, 164, 65, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.wl-gold:hover::after {
+  transform: translateX(130%);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .wl-float,
   .wl-swing,

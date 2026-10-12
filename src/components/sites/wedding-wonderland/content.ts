@@ -1,7 +1,8 @@
 /**
  * Everything the visitor reads or sees lives in this file: brand, hero copy, UI labels, the five
- * showpiece sections, their photos and their moodboard palettes. To reskin or translate the site,
- * edit this file only. No component needs to change.
+ * showpiece sections, the finale (founder profile, WhatsApp link and consultation form), their
+ * photos and their moodboard palettes. To reskin or translate the site, edit this file only. No
+ * component needs to change.
  *
  * PHOTO RULES THAT APPLY TO EVERY SECTION
  * - Each section is a full-bleed background. It is cover-cropped to the screen, so the edges of
@@ -16,7 +17,15 @@
  *   supply `mobileSrc`: a portrait crop, 3:5, at least 1200 x 2000 px. Delete the `mobileSrc`
  *   line to reuse the landscape photo on phones.
  * - Drop the files in /public/placeholders (or anywhere under /public and update `src`).
- *   Run `npm run placeholders` to regenerate the labelled placeholder images.
+ *   `npm run placeholders` creates any labelled placeholder that is missing. It never overwrites a
+ *   file that exists, so your real photos are safe; add `-- --force` to regenerate on purpose.
+ *
+ * FINALE PORTRAIT (FINALE.founder.portrait)
+ * - A portrait photo of the founder, not a landscape scene. Phones show `mobileSrc` full-bleed
+ *   (3:5, at least 1200 x 2000 px) with the text over its lower half, so keep the head and
+ *   shoulders in the upper-middle of the frame and the lower half calm and dark.
+ * - Larger screens frame `src` in an arch beside the text (4:5, at least 1600 x 2000 px): keep the
+ *   face well inside the arch, away from its curved top corners.
  */
 
 export type Photo = {
@@ -29,6 +38,11 @@ export type Photo = {
   focus: string;
   /** Used by the placeholder generator and as a note to yourself. Not shown to visitors. */
   brief: string;
+  /**
+   * Shape of the placeholder the generator draws for `src`. "landscape" (the default) is the 16:9
+   * section background; "portrait" is the 4:5 arch-framed portrait used by the finale.
+   */
+  desktopShape?: "landscape" | "portrait";
 };
 
 export type Swatch = { name: string; value: string };
@@ -70,7 +84,7 @@ export const UI = {
   home: "Home",
   moodboard: "Moodboard",
   moodboardClose: "Close moodboard",
-  sectionNavLabel: "Showpiece sections",
+  sectionNavLabel: "Sections",
   soundOn: "Turn sound on",
   soundOff: "Mute sound",
 } as const;
@@ -206,8 +220,162 @@ export const SECTIONS: readonly Section[] = [
   },
 ];
 
-/** Index of the section named by a URL hash (with or without the leading #), or -1. */
-export function sectionIndexFromHash(hash: string): number {
+/* ---------------------------------------------------------------------------------------------
+ * THE FINALE (scene 6): meet the founder, then start the conversation
+ * ------------------------------------------------------------------------------------------- */
+
+export type ConsultationField = {
+  label: string;
+  placeholder: string;
+  /** Set to false to make the field optional. */
+  required: boolean;
+  /** Shown under the field when it is required and empty (or, for guests, not a whole number). */
+  error: string;
+};
+
+export type Finale = {
+  /** URL hash that selects the finale (/#meet-the-founder). Lowercase, no spaces. */
+  id: string;
+  /** Used by the section dots, screen readers and the moodboard. Not drawn on the page itself. */
+  title: string;
+  /** Small line above the headline. */
+  eyebrow: string;
+  headline: string;
+  founder: {
+    /** Tiny label above the name. */
+    label: string;
+    name: string;
+    role: string;
+    /** Two or three sentences. Keep it under ~260 characters so it fits a phone screen. */
+    bio: string;
+    portrait: Photo;
+  };
+  whatsapp: {
+    /** https://wa.me/<country code + number, digits only>. Opens a chat with that number. */
+    url: string;
+    label: string;
+    /** Read out to screen readers after the label. */
+    newTabNote: string;
+  };
+  consultation: {
+    /** Label on the button that opens the form. */
+    buttonLabel: string;
+    /** Heading inside the form. */
+    title: string;
+    intro: string;
+    closeLabel: string;
+    submitLabel: string;
+    /** First line of the WhatsApp message the form prepares for the visitor to send. */
+    messageGreeting: string;
+    privacyNote: string;
+    /** Shown after the visitor sends the form. */
+    sent: { title: string; body: string; linkLabel: string };
+    fields: {
+      name: ConsultationField;
+      date: ConsultationField & { pastError: string };
+      venue: ConsultationField;
+      guests: ConsultationField;
+      services: { label: string; options: readonly string[] };
+    };
+  };
+  /** Palette shown in the moodboard panel while the finale is open. */
+  swatches: readonly Swatch[];
+  /** Changes the shape of the foreground blooms. Any whole number. */
+  bloomSeed: number;
+};
+
+export const FINALE: Finale = {
+  id: "meet-the-founder",
+  title: "Meet the Founder & Book a Consultation",
+  eyebrow: "Begin the Journey",
+  headline: "Let’s create your extraordinary.",
+  founder: {
+    label: "Meet the founder",
+    // PLACEHOLDERS: replace the name, role and bio with the founder's own details and words.
+    name: "Zarish",
+    role: `Founder, ${BRAND.name}`,
+    bio: `${BRAND.name} was founded on a simple belief: a wedding should feel like stepping into the most beautiful room you have ever imagined. Every arch, bloom and candle is chosen with intention, so your day feels unmistakably yours.`,
+    portrait: {
+      // The founder, head and shoulders in the upper-middle of the frame. Phones show `mobileSrc`
+      // full-bleed with the text over its lower half; larger screens frame `src` in an arch.
+      src: "/placeholders/founder-portrait.jpg",
+      mobileSrc: "/placeholders/founder-portrait-mobile.jpg",
+      alt: "The founder of Zarish Soirées, seen from behind, looking out over a city at night",
+      focus: "50% 38%",
+      brief: "Founder portrait: head and shoulders, upper-middle of the frame",
+      desktopShape: "portrait",
+    },
+  },
+  whatsapp: {
+    url: "https://wa.me/923137027761",
+    label: "Chat on WhatsApp",
+    newTabNote: "(opens in a new tab)",
+  },
+  consultation: {
+    buttonLabel: "Schedule a Private Consultation",
+    title: "Schedule a Private Consultation",
+    intro: "Tell us a little about your day and we’ll pick up the conversation on WhatsApp.",
+    closeLabel: "Close",
+    submitLabel: "Send via WhatsApp",
+    messageGreeting: `Hello ${BRAND.name}, I would like to schedule a private consultation.`,
+    privacyNote: "Your details open in WhatsApp as a message. Nothing is stored on this website.",
+    sent: {
+      title: "Your request is ready",
+      body: "WhatsApp should have opened with your details. If it didn’t, use the button below.",
+      linkLabel: "Open WhatsApp",
+    },
+    fields: {
+      name: {
+        label: "Your name",
+        placeholder: "Full name",
+        required: true,
+        error: "Please tell us your name.",
+      },
+      date: {
+        label: "Event date",
+        placeholder: "",
+        required: true,
+        error: "Please choose your event date.",
+        pastError: "Please choose a date from today onwards.",
+      },
+      venue: {
+        label: "Venue",
+        placeholder: "Venue or city, or “still deciding”",
+        required: false,
+        error: "Please tell us the venue.",
+      },
+      guests: {
+        label: "Guest count",
+        placeholder: "e.g. 250",
+        required: false,
+        error: "Please enter the number of guests as a whole number.",
+      },
+      services: {
+        label: "Services needed",
+        // The five showpieces, so the list follows any rename, plus the whole-event option.
+        options: [...SECTIONS.map((s) => s.title), "Full event management"],
+      },
+    },
+  },
+  swatches: [
+    { name: "Noir", value: "#050508" },
+    { name: "Champagne", value: "#d9a441" },
+    { name: "Ivory", value: "#fff4e3" },
+    { name: "Rose", value: "#e8457b" },
+    { name: "Plum", value: "#5a1a4a" },
+    { name: "Jade", value: "#1f8a70" },
+  ],
+  bloomSeed: 606,
+};
+
+/** What every scene (the five showpieces and the finale) offers to navigation and the moodboard. */
+export type SceneMeta = { id: string; title: string; swatches: readonly Swatch[] };
+
+/** Every scene in scroll order. The finale is always last. */
+export const SCENES: readonly SceneMeta[] = [...SECTIONS, FINALE];
+
+/** Index of the scene named by a URL hash (with or without the leading #), or -1. */
+export function sceneIndexFromHash(hash: string): number {
   const id = hash.replace(/^#/, "");
-  return SECTIONS.findIndex((s) => s.id === id);
+  return SCENES.findIndex((s) => s.id === id);
 }

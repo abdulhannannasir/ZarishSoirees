@@ -4,7 +4,9 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties } from "re
 import { ArrowDown, ChevronLeft, LayoutGrid, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 import "./wonderland.css";
 import { Cluster, HangingVine } from "./art";
-import { BRAND, HERO, SECTIONS, UI, sectionIndexFromHash } from "./content";
+import { ConsultationModal } from "./consultation-modal";
+import { BRAND, FINALE, HERO, SCENES, SECTIONS, UI, sceneIndexFromHash } from "./content";
+import { FinaleScene } from "./finale-scene";
 import { ShowpieceScene } from "./showpiece-scene";
 import { useAmbientSound } from "./use-ambient-sound";
 
@@ -15,14 +17,15 @@ type SceneState = "future" | "dim" | "active" | "past";
 /** Enter -> scene handoff, then scene -> settled (UI appears). Shortened under reduced motion. */
 const ENTER_MS = 3400;
 const SETTLE_MS = 5400;
-/** After a section switch, input is ignored this long so one flick can't skip a section. */
+/** After a scene switch, input is ignored this long so one flick can't skip a scene. */
 const SWITCH_LOCK_MS = 2400;
-/** Pixels of wheel that traverse one section's parallax. Tune this to change the scroll pace. */
+/** Pixels of wheel that traverse one scene's parallax. Tune this to change the scroll pace. */
 const WHEEL_RANGE = 900;
-/** How far past a section's end (in progress units, ~160px of wheel) counts as "go to the next". */
+/** How far past a scene's end (in progress units, ~160px of wheel) counts as "go to the next". */
 const OVERSHOOT = 0.18;
 
-const LAST = SECTIONS.length - 1;
+/** The five showpieces and then the finale, in scroll order. */
+const LAST = SCENES.length - 1;
 
 type Cutout = {
   id: string;
@@ -57,29 +60,40 @@ const pill =
  */
 const iconOnlyOnPhones = "max-sm:size-11 max-sm:justify-center max-sm:px-0 max-sm:py-0";
 
+/** Today as YYYY-MM-DD in the visitor's own time zone: the consultation form's earliest date. */
+function todayIso(): string {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
 export function Wonderland() {
   const [phase, setPhase] = useState<Phase>("intro");
   const [stage, setStage] = useState<0 | 1>(0);
   const [current, setCurrent] = useState(0);
   const [boardOpen, setBoardOpen] = useState(false);
-  const [atEnd, setAtEnd] = useState(false);
+  const [consultOpen, setConsultOpen] = useState(false);
+  const [minDate, setMinDate] = useState("");
+
+  /** While any dialog is open, the page must not scroll or react to keys behind it. */
+  const modalOpen = boardOpen || consultOpen;
 
   const sound = useAmbientSound();
 
   const rootRef = useRef<HTMLElement>(null);
-  /** One element per section. Each carries its own scroll variable `--p` (0..1). */
+  /** One element per scene. Each carries its own scroll variable `--p` (0..1). */
   const sceneRefs = useRef<Array<HTMLDivElement | null>>([]);
   const timers = useRef<number[]>([]);
   /** Mirrors `current` for handlers and the rAF loop, which must not see a stale value. */
   const currentRef = useRef(0);
   /**
-   * Target and eased progress through the *current* section, 0..1. Kept out of state because it
-   * changes every frame; the eased value is written to that section's `--p`. Because every
-   * section owns its variable, a section that is flying away keeps its last position.
+   * Target and eased progress through the *current* scene, 0..1. Kept out of state because it
+   * changes every frame; the eased value is written to that scene's `--p`. Because every
+   * scene owns its variable, a scene that is flying away keeps its last position.
    */
   const targetP = useRef(0);
   const easedP = useRef(0);
-  /** Scroll pushed past either end of a section, accumulated until it is enough to switch. */
+  /** Scroll pushed past either end of a scene, accumulated until it is enough to switch. */
   const overshoot = useRef(0);
   const lockUntil = useRef(0);
 
@@ -110,9 +124,8 @@ export function Wonderland() {
       targetP.current = start;
       easedP.current = start;
       setProgress(next, start);
-      window.history.replaceState(null, "", `#${SECTIONS[next].id}`);
+      window.history.replaceState(null, "", `#${SCENES[next].id}`);
       setCurrent(next);
-      setAtEnd(false);
     },
     [setProgress],
   );
@@ -120,13 +133,13 @@ export function Wonderland() {
   const enter = () => {
     if (phase !== "intro") return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // The hash is the destination of Enter: a deep link lands in its section, otherwise the first.
-    const fromHash = sectionIndexFromHash(window.location.hash);
+    // The hash is the destination of Enter: a deep link lands in its scene, otherwise the first.
+    const fromHash = sceneIndexFromHash(window.location.hash);
     const index = fromHash >= 0 ? fromHash : 0;
     currentRef.current = index;
     setCurrent(index);
     sound.start();
-    window.history.replaceState(null, "", `#${SECTIONS[index].id}`);
+    window.history.replaceState(null, "", `#${SCENES[index].id}`);
     setPhase("entering");
     schedule(() => setPhase("scene"), reduce ? 300 : ENTER_MS);
     schedule(() => setStage(1), reduce ? 700 : SETTLE_MS);
@@ -139,9 +152,9 @@ export function Wonderland() {
     easedP.current = 0;
     overshoot.current = 0;
     lockUntil.current = 0;
-    SECTIONS.forEach((_, i) => setProgress(i, 0));
+    SCENES.forEach((_, i) => setProgress(i, 0));
     setBoardOpen(false);
-    setAtEnd(false);
+    setConsultOpen(false);
     setCurrent(0);
     setStage(0);
     setPhase("intro");
@@ -156,15 +169,20 @@ export function Wonderland() {
     [goToSection],
   );
 
-  // "Scroll to explore the magic" is also a button: it carries on to the next section.
+  // "Scroll to explore the magic" is also a button: it carries on to the next scene.
   const nextSection = useCallback(() => jumpTo(currentRef.current + 1), [jumpTo]);
+
+  const openConsultation = useCallback(() => {
+    setMinDate(todayIso());
+    setConsultOpen(true);
+  }, []);
+  const closeConsultation = useCallback(() => setConsultOpen(false), []);
 
   // In-scene scroll: wheel, touch, and keys feed a target; a rAF loop eases toward it.
   useEffect(() => {
     if (stage !== 1) return;
 
     let raf = 0;
-    let end = false;
     let lastY = 0;
 
     const bump = (delta: number) => {
@@ -184,25 +202,25 @@ export function Wonderland() {
         overshoot.current = 0;
       }
     };
-    /** Home / End move within the section; they never switch sections. */
+    /** Home / End move within the scene; they never switch scenes. */
     const jump = (value: number) => {
       targetP.current = value;
       overshoot.current = 0;
     };
 
     const onWheel = (e: WheelEvent) => {
-      if (!boardOpen) bump(e.deltaY / WHEEL_RANGE);
+      if (!modalOpen) bump(e.deltaY / WHEEL_RANGE);
     };
     const onTouchStart = (e: TouchEvent) => {
       lastY = e.touches[0]?.clientY ?? 0;
     };
     const onTouchMove = (e: TouchEvent) => {
       const y = e.touches[0]?.clientY ?? lastY;
-      if (!boardOpen) bump((lastY - y) / (window.innerHeight * 0.9));
+      if (!modalOpen) bump((lastY - y) / (window.innerHeight * 0.9));
       lastY = y;
     };
     const onKey = (e: KeyboardEvent) => {
-      if (boardOpen) return;
+      if (modalOpen) return;
       if (e.key === "ArrowDown" || e.key === "PageDown") bump(0.2);
       else if (e.key === "ArrowUp" || e.key === "PageUp") bump(-0.2);
       else if (e.key === "End") jump(1);
@@ -215,11 +233,6 @@ export function Wonderland() {
       const next = Math.abs(target - eased) < 0.0004 ? target : eased + (target - eased) * 0.08;
       easedP.current = next;
       setProgress(currentRef.current, next);
-      const nowEnd = next > 0.97;
-      if (nowEnd !== end) {
-        end = nowEnd;
-        setAtEnd(nowEnd);
-      }
       raf = window.requestAnimationFrame(tick);
     };
     raf = window.requestAnimationFrame(tick);
@@ -235,13 +248,13 @@ export function Wonderland() {
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("keydown", onKey);
     };
-  }, [stage, boardOpen, goToSection, setProgress]);
+  }, [stage, modalOpen, goToSection, setProgress]);
 
-  // Editing the hash by hand (or following a link to another section) switches sections too.
+  // Editing the hash by hand (or following a link to another scene) switches scenes too.
   useEffect(() => {
     if (stage !== 1) return;
     const onHashChange = () => {
-      const index = sectionIndexFromHash(window.location.hash);
+      const index = sceneIndexFromHash(window.location.hash);
       const from = currentRef.current;
       if (index >= 0 && index !== from) goToSection(index, index > from ? "forward" : "back");
     };
@@ -259,7 +272,8 @@ export function Wonderland() {
   }, [boardOpen]);
 
   const SoundIcon = sound.enabled ? Volume2 : VolumeX;
-  const hintHidden = current === LAST && atEnd;
+  /** The finale has its own buttons, so the scroll hint has nothing left to point at. */
+  const hintHidden = current === LAST;
 
   const sceneState = (index: number): SceneState => {
     if (phase === "intro") return "future";
@@ -273,22 +287,36 @@ export function Wonderland() {
       ref={rootRef}
       data-phase={phase}
       data-stage={stage}
-      className="wl relative h-dvh w-full select-none overflow-hidden bg-black text-white"
+      className="wl relative h-dvh w-full select-none overflow-clip bg-black text-white"
     >
-      {/* The showpiece sections. Only one is "active"; the rest wait behind or have been flown past. */}
-      {SECTIONS.map((section, i) => {
+      {/* The scenes. Only one is "active"; the rest wait behind or have been flown past. */}
+      {SCENES.map((scene, i) => {
         const state = sceneState(i);
         return (
           <div
-            key={section.id}
+            key={scene.id}
             ref={(el) => {
               sceneRefs.current[i] = el;
             }}
             data-state={state}
-            aria-hidden={state !== "active"}
-            className="wl-scene absolute inset-0 overflow-hidden"
+            inert={state !== "active"}
+            className="wl-scene absolute inset-0 overflow-clip"
           >
-            <ShowpieceScene section={section} index={i} total={SECTIONS.length} priority={i === 0} />
+            {i < SECTIONS.length ? (
+              <ShowpieceScene
+                section={SECTIONS[i]}
+                index={i}
+                total={SCENES.length}
+                priority={i === 0}
+              />
+            ) : (
+              <FinaleScene
+                finale={FINALE}
+                index={i}
+                total={SCENES.length}
+                onConsult={openConsultation}
+              />
+            )}
           </div>
         );
       })}
@@ -356,7 +384,7 @@ export function Wonderland() {
       </section>
 
       <p aria-live="polite" className="sr-only">
-        {phase === "scene" && stage === 1 ? SECTIONS[current].title : ""}
+        {phase === "scene" && stage === 1 ? SCENES[current].title : ""}
       </p>
 
       {/* Header */}
@@ -384,25 +412,25 @@ export function Wonderland() {
         </button>
       </header>
 
-      {/* Section dots: where you are, and a way to jump. */}
+      {/* Scene dots: where you are, and a way to jump. */}
       <nav
         aria-label={UI.sectionNavLabel}
         inert={stage !== 1}
         className="wl-ui absolute right-[clamp(8px,2vw,26px)] top-1/2 z-30 flex -translate-y-1/2 flex-col"
       >
-        {SECTIONS.map((section, i) => (
+        {SCENES.map((scene, i) => (
           <button
-            key={section.id}
+            key={scene.id}
             type="button"
             onClick={() => jumpTo(i)}
-            aria-label={`${i + 1}. ${section.title}`}
+            aria-label={`${i + 1}. ${scene.title}`}
             aria-current={i === current}
             className="wl-dot focus-visible:outline-2 focus-visible:outline-white"
           />
         ))}
       </nav>
 
-      {/* Scroll hint: stays until the very end of the last section. */}
+      {/* Scroll hint: leads from scene to scene, and steps aside for the finale's own buttons. */}
       <button
         type="button"
         onClick={nextSection}
@@ -425,7 +453,7 @@ export function Wonderland() {
         <SoundIcon className="size-[18px]" aria-hidden="true" />
       </button>
 
-      {/* Moodboard: the current section's palette */}
+      {/* Moodboard: the current scene's palette */}
       {boardOpen && (
         <div
           role="dialog"
@@ -451,10 +479,10 @@ export function Wonderland() {
               </button>
             </div>
             <p className="mb-4 font-label text-xs uppercase tracking-[0.14em] text-white/50">
-              {SECTIONS[current].title}
+              {SCENES[current].title}
             </p>
             <ul className="grid grid-cols-3 gap-4 font-label text-xs">
-              {SECTIONS[current].swatches.map((s) => (
+              {SCENES[current].swatches.map((s) => (
                 <li key={`${s.name}-${s.value}`} className="flex flex-col gap-2">
                   <span
                     className="block aspect-square rounded-full border border-white/20"
@@ -468,6 +496,9 @@ export function Wonderland() {
           </div>
         </div>
       )}
+
+      {/* Consultation form: rendered here, outside the scenes, so their transforms can't clip it. */}
+      <ConsultationModal open={consultOpen} onClose={closeConsultation} minDate={minDate} />
     </main>
   );
 }

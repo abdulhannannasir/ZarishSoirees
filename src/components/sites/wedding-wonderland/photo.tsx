@@ -9,8 +9,17 @@ import type { Photo as PhotoSpec } from "./content";
  * optimised, responsive `srcSet` that <Image> would, and the <picture> element is what lets the
  * browser choose between the two crops.
  */
-export function Photo({ photo, priority = false }: { photo: PhotoSpec; priority?: boolean }) {
-  const common = { alt: photo.alt, fill: true, sizes: "100vw", priority } as const;
+export function Photo({
+  photo,
+  priority = false,
+  sizes = "100vw",
+}: {
+  photo: PhotoSpec;
+  priority?: boolean;
+  /** How wide the photo is drawn, so the browser picks a right-sized file. Full width by default. */
+  sizes?: string;
+}) {
+  const common = { alt: photo.alt, fill: true, sizes, priority } as const;
   const desktop = getImageProps({ ...common, src: photo.src });
   const style = { ...desktop.props.style, objectFit: "cover" as const, objectPosition: photo.focus };
 
