@@ -48,8 +48,8 @@ present at load still shows the hero, and Enter lands in that section.
 3. **Sections** — each is a full-bleed photo with a legibility gradient, floating blooms, and a
    bottom-left copy block (index, kicker, title, body) that rises in line by line.
 4. **Moving between sections** — the active section zooms past the viewer while the next rises
-   from the distance; going back reverses it. Triggered by wheel/touch/arrows past the end of a
-   section, the "Scroll to explore the magic" button, the section dots, or the hash.
+   from the distance; going back reverses it. Triggered by wheel/arrows past the end of a section,
+   a swipe on touch screens, the "Scroll to explore the magic" button, the section dots, or the hash.
 5. **Finale (scene 6)** — a dark stage instead of a full-bleed photo. Eyebrow "06 / 06 — Begin
    the Journey", the headline "Let’s create your extraordinary.", the founder's name, role and a
    short bio, then two buttons: a gold **Chat on WhatsApp** link and an outlined **Schedule a
@@ -81,7 +81,19 @@ instead of snapping back to zero.
 - Input is ignored for 2.4 s after a switch so one flick cannot skip a section.
 - Keys: ↑/↓/PageUp/PageDown move within a section and cross at the ends; Home/End stay inside it.
 - Editing the hash by hand switches sections. Home clears the hash and returns to the hero.
-- While the consultation form or the moodboard is open, wheel, touch and keys do nothing behind it.
+- **Touch is a swipe, not a scrub.** One swipe up or down moves one section: a flick, or a drag of
+  about an eighth of the screen height (`SWIPE_*` in `wonderland.tsx`). While the finger is down the
+  section follows it a little and eases back if it was not a swipe. Sideways drags and pinches do
+  nothing. (Scrubbing the parallax with a finger made the content wobble and needed about three
+  screens of swiping to change section.)
+- **The page itself never scrolls or bounces.** The stage is `position: fixed`; `html` and `body`
+  are locked in `wonderland.css` (`overflow: hidden`, `overscroll-behavior: none`); and a
+  non-passive `touchmove` listener cancels one-finger drags, because iOS Safari otherwise
+  rubber-bands the whole screen (Chrome on Android would pull to refresh). The listener must stay
+  `{ passive: false }`: iOS makes window-level touch listeners passive, which ignores
+  `preventDefault`. Pinch zoom, and panning while zoomed in, are left alone. Anything that has to
+  scroll natively (the consultation form) carries `data-touch-scroll`.
+- While the consultation form or the moodboard is open, wheel, swipes and keys do nothing behind it.
 
 ## Consultation form (finale)
 
@@ -152,6 +164,11 @@ outside the scenes because their transforms would break its positioning.
   check very bright images (white linen, daylight) and raise the scrim in `wonderland.css` if needed.
 - All six scenes' photos load up front (they are stacked in the page) so transitions never wait on
   the network. With heavy photography, consider lazy-loading scenes 3-6.
+- iOS Safari's rubber-band cannot be reproduced in the browser pane used for checking (it is
+  Chromium). The touch handling was checked with synthetic touch events, and the original bug was
+  diagnosed by measuring a screen recording from an iPhone (the page was pulled down 80-95 pt and
+  sprang back, three times in five seconds). Anything touch-related still needs a look on a real
+  iPhone.
 - Verified in a browser pane that renders at about 1 frame per second, so real-time smoothness
   of the scroll easing and parallax was checked through computed values and forced-repaint
   screenshots, not by watching it run.

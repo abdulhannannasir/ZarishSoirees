@@ -23,6 +23,15 @@ const SWITCH_LOCK_MS = 2400;
 const WHEEL_RANGE = 900;
 /** How far past a scene's end (in progress units, ~160px of wheel) counts as "go to the next". */
 const OVERSHOOT = 0.18;
+/** A touch swipe moves one scene when it covers this fraction of the screen height... */
+const SWIPE_FAR = 0.12;
+/** ...or is a quick flick: at least this many px, at this many px per millisecond. */
+const SWIPE_FLICK_MIN = 24;
+const SWIPE_FLICK_SPEED = 0.4;
+/** A touch that moves less than this (px) is still a tap, so the browser is left alone. */
+const TOUCH_SLOP = 4;
+
+const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
 /** The five showpieces and then the finale, in scroll order. */
 const LAST = SCENES.length - 1;
@@ -178,12 +187,13 @@ export function Wonderland() {
   }, []);
   const closeConsultation = useCallback(() => setConsultOpen(false), []);
 
-  // In-scene scroll: wheel, touch, and keys feed a target; a rAF loop eases toward it.
+  // In-scene scroll: the wheel and keys feed a target that a rAF loop eases toward. Touch is a
+  // swipe instead (below): scrubbing with a finger left the content wobbling up and down and took
+  // about three screens of swiping to reach the next scene.
   useEffect(() => {
     if (stage !== 1) return;
 
     let raf = 0;
-    let lastY = 0;
 
     const bump = (delta: number) => {
       if (performance.now() < lockUntil.current) return;
@@ -211,13 +221,40 @@ export function Wonderland() {
     const onWheel = (e: WheelEvent) => {
       if (!modalOpen) bump(e.deltaY / WHEEL_RANGE);
     };
+    // Touch: while the finger is down the scene follows it a little, then settles back. A flick,
+    // or a drag of about an eighth of the screen, moves to the next scene (swipe up) or the
+    // previous one (swipe down) with the usual zoom. Sideways drags and pinches are ignored.
+    let swipe: { x: number; y: number; at: number; rest: number } | null = null;
+    const settle = () => {
+      if (swipe) targetP.current = swipe.rest;
+      swipe = null;
+    };
     const onTouchStart = (e: TouchEvent) => {
-      lastY = e.touches[0]?.clientY ?? 0;
+      const touch = e.touches[0];
+      swipe =
+        modalOpen || e.touches.length !== 1 || !touch
+          ? null
+          : { x: touch.clientX, y: touch.clientY, at: performance.now(), rest: targetP.current };
     };
     const onTouchMove = (e: TouchEvent) => {
-      const y = e.touches[0]?.clientY ?? lastY;
-      if (!modalOpen) bump((lastY - y) / (window.innerHeight * 0.9));
-      lastY = y;
+      const touch = e.touches[0];
+      if (!swipe || !touch) return;
+      if (e.touches.length !== 1) return settle();
+      const up = swipe.y - touch.clientY;
+      if (Math.abs(up) < Math.abs(touch.clientX - swipe.x)) return;
+      targetP.current = clamp01(swipe.rest + up / (window.innerHeight * 1.4));
+    };
+    const onTouchEnd = (e: TouchEvent) => {
+      const start = swipe;
+      const touch = e.changedTouches[0];
+      settle();
+      if (!start || !touch) return;
+      const up = start.y - touch.clientY;
+      const elapsed = Math.max(1, performance.now() - start.at);
+      const vertical = Math.abs(up) > Math.abs(touch.clientX - start.x) * 1.2;
+      const far = Math.abs(up) >= window.innerHeight * SWIPE_FAR;
+      const flick = Math.abs(up) >= SWIPE_FLICK_MIN && Math.abs(up) / elapsed >= SWIPE_FLICK_SPEED;
+      if (vertical && (far || flick)) jumpTo(currentRef.current + (up > 0 ? 1 : -1));
     };
     const onKey = (e: KeyboardEvent) => {
       if (modalOpen) return;
@@ -240,15 +277,47 @@ export function Wonderland() {
     window.addEventListener("wheel", onWheel, { passive: true });
     window.addEventListener("touchstart", onTouchStart, { passive: true });
     window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+    window.addEventListener("touchcancel", settle, { passive: true });
     window.addEventListener("keydown", onKey);
     return () => {
       window.cancelAnimationFrame(raf);
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchstart", onTouchStart);
       window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", settle);
       window.removeEventListener("keydown", onKey);
     };
-  }, [stage, modalOpen, goToSection, setProgress]);
+  }, [stage, modalOpen, goToSection, jumpTo, setProgress]);
+
+  // iOS Safari pans and rubber-bands the whole page under a drag that is not cancelled (and Chrome
+  // on Android pulls to refresh), so the screen bobbed up and down under the finger. Cancel
+  // one-finger drags everywhere except in a dialog that scrolls (`data-touch-scroll`). The listener
+  // must be explicitly non-passive: iOS makes window-level touch listeners passive, which silently
+  // ignores preventDefault. Pinch zoom, and panning while zoomed in, keep their native behaviour.
+  useEffect(() => {
+    let x0 = 0;
+    let y0 = 0;
+    let native = false;
+    const onStart = (e: TouchEvent) => {
+      x0 = e.touches[0]?.clientX ?? 0;
+      y0 = e.touches[0]?.clientY ?? 0;
+      native = e.target instanceof Element && e.target.closest("[data-touch-scroll]") !== null;
+    };
+    const onMove = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      if (native || !touch || e.touches.length !== 1 || !e.cancelable) return;
+      if ((window.visualViewport?.scale ?? 1) > 1.01) return;
+      if (Math.hypot(touch.clientX - x0, touch.clientY - y0) > TOUCH_SLOP) e.preventDefault();
+    };
+    window.addEventListener("touchstart", onStart, { passive: true });
+    window.addEventListener("touchmove", onMove, { passive: false });
+    return () => {
+      window.removeEventListener("touchstart", onStart);
+      window.removeEventListener("touchmove", onMove);
+    };
+  }, []);
 
   // Editing the hash by hand (or following a link to another scene) switches scenes too.
   useEffect(() => {
@@ -287,7 +356,7 @@ export function Wonderland() {
       ref={rootRef}
       data-phase={phase}
       data-stage={stage}
-      className="wl relative h-dvh w-full select-none overflow-clip bg-black text-white"
+      className="wl fixed inset-0 select-none overflow-clip bg-black text-white"
     >
       {/* The scenes. Only one is "active"; the rest wait behind or have been flown past. */}
       {SCENES.map((scene, i) => {

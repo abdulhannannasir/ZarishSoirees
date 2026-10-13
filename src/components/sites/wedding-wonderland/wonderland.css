@@ -6,9 +6,27 @@
  * from JS. All timing lives here so React only flips attributes and writes `--p`.
  */
 
+/*
+ * The stage is one fixed screen, so the page behind it must never scroll. iOS Safari still
+ * rubber-bands (and Chrome on Android pulls to refresh) a page that merely could move, so the
+ * document is locked here and one-finger drags are also cancelled in `wonderland.tsx`.
+ */
 html:has(.wl),
 body:has(.wl) {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
   background: #000;
+}
+
+/*
+ * A dialog that scrolls (marked `data-touch-scroll`) keeps native touch scrolling, which the
+ * one-finger-drag canceller in `wonderland.tsx` skips, but it must not pass leftover scroll on
+ * to the locked page behind it.
+ */
+[data-touch-scroll] {
+  overscroll-behavior: contain;
 }
 
 .wl {
