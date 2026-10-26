@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import Image from "next/image";
 import { ArrowDown, ChevronLeft, LayoutGrid, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 import "./wonderland.css";
 import { Cluster, HangingVine } from "./art";
@@ -420,24 +421,25 @@ export function Wonderland() {
         inert={phase !== "intro"}
         className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center text-[var(--wl-ink)]"
       >
-        <p
-          className="wl-intro-item wl-fade font-script text-[clamp(3rem,10.5vw,5.5rem)] leading-none text-[var(--wl-sage-deep)]"
-          style={{ "--d": "0.5s" } as CSSProperties}
-        >
-          {HERO.eyebrow}
-        </p>
+        {/* The logo is the page's h1. It is as wide as the screen allows (up to 720px) but never taller
+            than 46% of the screen height, so the tagline and button always fit under it. */}
         <h1
-          className="wl-intro-item wl-title mt-3 font-display text-[clamp(2.2rem,8.2vw,5.75rem)] font-medium uppercase leading-[0.95] tracking-[-0.01em]"
-          style={{ "--d": "0.7s" } as CSSProperties}
+          className="wl-intro-item wl-title"
+          style={{ "--d": "0.5s", "--logo-ar": HERO.logo.width / HERO.logo.height } as CSSProperties}
         >
-          {HERO.headline.map((line) => (
-            <span key={line} className="block">
-              {line}
-            </span>
-          ))}
+          <Image
+            src={HERO.logo.src}
+            alt={HERO.logo.alt}
+            width={HERO.logo.width}
+            height={HERO.logo.height}
+            loading="eager"
+            fetchPriority="high"
+            sizes="(max-width: 800px) 90vw, 720px"
+            className="mx-auto block h-auto w-[min(90vw,720px,calc(46vh*var(--logo-ar)))]"
+          />
         </h1>
         <p
-          className="wl-intro-item wl-fade mt-3 max-w-[32ch] font-display text-[clamp(1.05rem,2.2vw,1.5rem)] italic sm:max-w-none"
+          className="wl-intro-item wl-fade mt-4 max-w-[32ch] font-display text-[clamp(1.05rem,2.2vw,1.5rem)] italic sm:max-w-none"
           style={{ "--d": "0.9s" } as CSSProperties}
         >
           {HERO.tagline}

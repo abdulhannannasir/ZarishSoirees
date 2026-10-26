@@ -93,10 +93,19 @@ const HERO_BACKDROP: Photo = {
 };
 
 export const HERO = {
-  /** Set in the brand's script face, in sage, like the signature in the logo. */
-  eyebrow: BRAND.name,
-  /** Two display lines. Keep each short enough to fit one line on a phone (about 14 characters). */
-  headline: ["Softly lit.", "Forever yours."],
+  /**
+   * The brand's logo (TWT monogram, script name, EVENTS), the one big mark in the hero. A PNG with a
+   * transparent background so it sits on the drapes; ink is sage and charcoal, so keep the backdrop light.
+   * To use a new logo, swap the file (same name) or point `src` at it and update `width` and `height`.
+   */
+  logo: {
+    src: "/images/twt-logo.png",
+    /** The file's size in pixels. Only used to reserve space and keep its proportions, not its drawn size. */
+    width: 1600,
+    height: 612,
+    /** Read out by screen readers: it is the page's main heading. */
+    alt: `${BRAND.name} Events`,
+  },
   tagline: "Quiet luxury, designed around your love story.",
   /** The button label. */
   enterLabel: "Enter",

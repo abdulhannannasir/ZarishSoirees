@@ -27,7 +27,7 @@ interaction. Fonts are open stand-ins (Cormorant Garamond, Jost), not the source
 
 | # | Hash | Title | Photo (desktop / phone) |
 | --- | --- | --- | --- |
-| – | `/` | Hero: "Softly lit. Forever yours." | `images/hero-drapes.jpg` (sheer ivory drapes), with cut-out roses and baby's breath |
+| – | `/` | Hero: the big TWT logo (`images/twt-logo.png`, cut out of the logo reveal video) over the tagline "Quiet luxury, designed around your love story." | `images/hero-drapes.jpg` (sheer ivory drapes), with cut-out roses and baby's breath |
 | 1 | `#grand-entrances` | Grand Entrances | `images/grand-entrance.jpg` / `…-mobile.jpg` |
 | 2 | `#bespoke-stage-backdrop` | Bespoke Stage & Backdrop Design | `images/bespoke-stage.jpg` / `…-mobile.jpg` |
 | 3 | `#floral-architecture` | Floral Architecture | `images/floral-architecture.jpg` / `…-mobile.jpg` |
