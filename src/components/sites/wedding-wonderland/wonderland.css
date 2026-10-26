@@ -7,6 +7,30 @@
  */
 
 /*
+ * THE WED THEORY PALETTE. Every colour on the site comes from here, so the whole look can be
+ * retuned in one place. It is taken from the brand's logo (sage script on ivory drapes) and its
+ * candlelit reference photo (bronze light, deep umber shadows, white roses).
+ *   umber     the dark stage behind photos and the finale (was pure black)
+ *   ivory     type on dark; the light of the candles
+ *   cream     the hero's sheer-drape backdrop
+ *   ink       type on the light hero
+ *   champagne the single accent: rules, buttons, the finale's glow
+ *   sage      the logo's green; script lettering and foliage
+ */
+:root {
+  --wl-umber: #17110a;
+  --wl-umber-rgb: 23, 17, 10;
+  --wl-ivory: #f6efe3;
+  --wl-cream: #efe6d6;
+  --wl-ink: #2b2418;
+  --wl-champagne: #cfae72;
+  --wl-champagne-rgb: 207, 174, 114;
+  --wl-champagne-light: #e6d3a8;
+  --wl-sage: #8b9378;
+  --wl-sage-deep: #5f6a4f;
+}
+
+/*
  * The stage is one fixed screen, so the page behind it must never scroll. iOS Safari still
  * rubber-bands (and Chrome on Android pulls to refresh) a page that merely could move, so the
  * document is locked here and one-finger drags are also cancelled in `wonderland.tsx`.
@@ -17,7 +41,13 @@ body:has(.wl) {
   min-height: 0;
   overflow: hidden;
   overscroll-behavior: none;
-  background: #000;
+  background: var(--wl-umber);
+}
+
+/* The hero is a light, sheer-drape ivory; anything that peeks out round it must match. */
+html:has(.wl[data-phase="intro"]),
+body:has(.wl[data-phase="intro"]) {
+  background: var(--wl-cream);
 }
 
 /*
@@ -122,6 +152,45 @@ body:has(.wl) {
   transform: translate3d(var(--fx, 0), var(--fy, 0), 0) scale(1.5);
 }
 
+/* ---------- hero backdrop ---------- */
+
+/*
+ * Sheer ivory drapes behind the hero. When the visitor enters, it dissolves slowly so the first
+ * section (already waiting behind it, dim) is revealed rather than cut to.
+ */
+.wl-hero-bg {
+  transition:
+    opacity 2.4s ease 0.5s,
+    visibility 0s linear 0s;
+}
+
+/* `visibility` flips only once the fade is done, so the finished layer stops painting. */
+.wl:not([data-phase="intro"]) .wl-hero-bg {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 2.4s ease 0.5s,
+    visibility 0s linear 3s;
+}
+
+/* A soft pool of light behind the headline, and a warm candle glow rising from the bottom edge. */
+.wl-hero-wash {
+  background:
+    radial-gradient(ellipse at 50% 46%, rgba(246, 239, 227, 0.7), rgba(246, 239, 227, 0) 64%),
+    radial-gradient(ellipse at 50% 118%, rgba(var(--wl-champagne-rgb), 0.3), transparent 56%);
+}
+
+/* The header wordmark sits over the light hero, then over dark photos: ink first, ivory after. */
+.wl-wordmark {
+  color: var(--wl-ivory);
+  transition: color 1.6s ease 0.4s;
+}
+
+.wl[data-phase="intro"] .wl-wordmark {
+  color: var(--wl-sage-deep);
+  text-shadow: none;
+}
+
 /* ---------- intro text ---------- */
 
 .wl-intro-item {
@@ -206,6 +275,7 @@ body:has(.wl) {
 
 .wl-fg {
   transform: translate3d(0, calc(var(--p) * -90px), 0) rotate(calc(var(--p) * 6deg));
+  filter: drop-shadow(0 10px 18px rgba(var(--wl-umber-rgb), 0.5));
   will-change: transform;
 }
 
@@ -218,11 +288,17 @@ body:has(.wl) {
   transform: translate3d(0, calc(var(--p) * -48px), 0);
 }
 
-/* Keeps white type readable on any photo, light or dark. */
+/*
+ * Keeps ivory type readable on any photo, light or dark. The wash is warm umber, not black, so
+ * the bright ivory photos stay candlelit instead of going grey. The left-hand wash is where
+ * the copy sits.
+ */
 .wl-scrim {
   background:
-    linear-gradient(to top, rgba(0, 0, 0, 0.74) 0%, rgba(0, 0, 0, 0.3) 38%, transparent 64%),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.42), transparent 24%);
+    radial-gradient(ellipse 72% 56% at 8% 94%, rgba(var(--wl-umber-rgb), 0.6), transparent 72%),
+    linear-gradient(to top, rgba(var(--wl-umber-rgb), 0.84) 0%, rgba(var(--wl-umber-rgb), 0.36) 40%, transparent 66%),
+    linear-gradient(to right, rgba(var(--wl-umber-rgb), 0.4), transparent 58%),
+    linear-gradient(to bottom, rgba(var(--wl-umber-rgb), 0.46), transparent 24%);
 }
 
 /* Copy lines rise in turn each time their section becomes active. */
@@ -244,19 +320,19 @@ body:has(.wl) {
   width: 8px;
   height: 8px;
   border-radius: 9999px;
-  background: rgba(255, 255, 255, 0.45);
+  background: rgba(246, 239, 227, 0.45);
   transition:
     height 0.5s var(--wl-ease-out),
     background-color 0.3s ease;
 }
 
 .wl-dot:hover::before {
-  background: #fff;
+  background: var(--wl-ivory);
 }
 
 .wl-dot[aria-current="true"]::before {
   height: 26px;
-  background: #fff;
+  background: var(--wl-champagne-light);
 }
 
 /* ---------- UI that only exists once the first scene has settled ---------- */
@@ -284,11 +360,11 @@ body:has(.wl) {
 
 /* ---------- finale (scene 6) ---------- */
 
-/* A dark stage with warm light bottom-left and a rose glow top-right, like the hero. */
+/* A dark umber stage: candle-warm light bottom-left and a breath of sage top-right. */
 .wl-finale-stage {
   background:
-    radial-gradient(ellipse at 18% 88%, rgba(217, 164, 65, 0.16), transparent 52%),
-    radial-gradient(ellipse at 88% 8%, rgba(232, 69, 123, 0.12), transparent 50%), #050508;
+    radial-gradient(ellipse at 18% 88%, rgba(var(--wl-champagne-rgb), 0.2), transparent 52%),
+    radial-gradient(ellipse at 88% 8%, rgba(139, 147, 120, 0.18), transparent 50%), var(--wl-umber);
 }
 
 /* The portrait drifts and zooms a little less than the showpiece photos do. */
@@ -303,23 +379,23 @@ body:has(.wl) {
   background:
     linear-gradient(
       to top,
-      rgba(0, 0, 0, 0.94) 0%,
-      rgba(0, 0, 0, 0.86) 34%,
-      rgba(0, 0, 0, 0.35) 62%,
+      rgba(var(--wl-umber-rgb), 0.95) 0%,
+      rgba(var(--wl-umber-rgb), 0.87) 34%,
+      rgba(var(--wl-umber-rgb), 0.36) 62%,
       transparent 82%
     ),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.4), transparent 18%);
+    linear-gradient(to bottom, rgba(var(--wl-umber-rgb), 0.4), transparent 18%);
 }
 
-/* The primary call to action: champagne gold, with a slow sheen across it on hover. */
+/* The primary call to action: soft champagne, with a slow sheen across it on hover. */
 .wl-gold {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #f6e3b4 0%, #d9a441 52%, #efd08a 100%);
-  color: #1a1208;
+  background: linear-gradient(135deg, #f1e4c6 0%, var(--wl-champagne) 52%, #e6d3a8 100%);
+  color: #20170b;
   text-shadow: none;
   box-shadow:
-    0 12px 34px -10px rgba(217, 164, 65, 0.6),
+    0 12px 34px -10px rgba(var(--wl-champagne-rgb), 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.65);
   transition:
     transform 0.3s var(--wl-ease-out),
@@ -339,7 +415,7 @@ body:has(.wl) {
 .wl-gold:hover {
   transform: translateY(-1px);
   box-shadow:
-    0 16px 40px -10px rgba(217, 164, 65, 0.75),
+    0 16px 40px -10px rgba(var(--wl-champagne-rgb), 0.7),
     inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 

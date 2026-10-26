@@ -7,6 +7,7 @@ import { Cluster, HangingVine } from "./art";
 import { ConsultationModal } from "./consultation-modal";
 import { BRAND, FINALE, HERO, SCENES, SECTIONS, UI, sceneIndexFromHash } from "./content";
 import { FinaleScene } from "./finale-scene";
+import { Photo } from "./photo";
 import { ShowpieceScene } from "./showpiece-scene";
 import { useAmbientSound } from "./use-ambient-sound";
 
@@ -61,7 +62,7 @@ const CUTOUTS: Cutout[] = [
 ];
 
 const pill =
-  "inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/45 px-4 py-2 text-white backdrop-blur-sm transition-colors hover:bg-black/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+  "inline-flex items-center gap-2 rounded-full border border-[var(--wl-ivory)]/25 bg-[rgba(var(--wl-umber-rgb),0.5)] px-4 py-2 text-[var(--wl-ivory)] backdrop-blur-sm transition-colors hover:bg-[rgba(var(--wl-umber-rgb),0.78)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--wl-champagne)]";
 
 /**
  * On phones the two header buttons shrink to 44px icon buttons (their text stays for screen
@@ -356,7 +357,7 @@ export function Wonderland() {
       ref={rootRef}
       data-phase={phase}
       data-stage={stage}
-      className="wl fixed inset-0 select-none overflow-clip bg-black text-white"
+      className="wl fixed inset-0 select-none overflow-clip bg-[var(--wl-umber)] text-[var(--wl-ivory)]"
     >
       {/* The scenes. Only one is "active"; the rest wait behind or have been flown past. */}
       {SCENES.map((scene, i) => {
@@ -390,6 +391,12 @@ export function Wonderland() {
         );
       })}
 
+      {/* Hero backdrop: sheer ivory drapes. It covers the first scene and dissolves on Enter. */}
+      <div className="wl-hero-bg pointer-events-none absolute inset-0" aria-hidden="true">
+        <Photo photo={HERO.backdrop} priority />
+        <div className="wl-hero-wash absolute inset-0" />
+      </div>
+
       {/* Intro cut-outs. Outer wrapper handles the exit; inner wrapper handles the idle float. */}
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         {CUTOUTS.map((c) => (
@@ -399,7 +406,7 @@ export function Wonderland() {
             style={{ "--fx": c.fx, "--fy": c.fy, "--enter-delay": c.enter } as CSSProperties}
           >
             <div
-              className="wl-float h-full w-full drop-shadow-[0_10px_18px_rgba(0,0,0,0.55)]"
+              className="wl-float h-full w-full drop-shadow-[0_12px_20px_rgba(70,48,22,0.32)]"
               style={{ "--dur": c.dur, "--delay": c.delay } as CSSProperties}
             >
               {c.vine ? <HangingVine seed={c.seed} /> : <Cluster seed={c.seed} blooms={c.blooms} />}
@@ -411,16 +418,16 @@ export function Wonderland() {
       {/* Hero */}
       <section
         inert={phase !== "intro"}
-        className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center"
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6 text-center text-[var(--wl-ink)]"
       >
         <p
-          className="wl-intro-item wl-fade font-label text-[13px] font-light uppercase tracking-[0.1em]"
+          className="wl-intro-item wl-fade font-script text-[clamp(3rem,10.5vw,5.5rem)] leading-none text-[var(--wl-sage-deep)]"
           style={{ "--d": "0.5s" } as CSSProperties}
         >
           {HERO.eyebrow}
         </p>
         <h1
-          className="wl-intro-item wl-title mt-4 font-display text-[clamp(2.2rem,8.2vw,5.75rem)] font-medium uppercase leading-[0.95] tracking-[-0.01em]"
+          className="wl-intro-item wl-title mt-3 font-display text-[clamp(2.2rem,8.2vw,5.75rem)] font-medium uppercase leading-[0.95] tracking-[-0.01em]"
           style={{ "--d": "0.7s" } as CSSProperties}
         >
           {HERO.headline.map((line) => (
@@ -438,7 +445,7 @@ export function Wonderland() {
         <button
           type="button"
           onClick={enter}
-          className="wl-intro-item wl-fade mt-6 rounded-full bg-white px-7 py-[7px] font-label text-[13px] text-black transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+          className="wl-intro-item wl-fade mt-6 rounded-full bg-[var(--wl-ink)] px-7 py-[7px] font-label text-[13px] text-[var(--wl-ivory)] transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--wl-ink)]"
           style={{ "--d": "1.1s" } as CSSProperties}
         >
           {HERO.enterLabel}
@@ -447,7 +454,7 @@ export function Wonderland() {
           className="wl-intro-item wl-fade mt-3 flex items-center gap-2 font-label text-[10px] uppercase tracking-[0.14em]"
           style={{ "--d": "1.3s" } as CSSProperties}
         >
-          <Sparkles className="size-3" aria-hidden="true" />
+          <Sparkles className="size-3 text-[var(--wl-sage-deep)]" aria-hidden="true" />
           {HERO.greeting}
         </p>
       </section>
@@ -467,7 +474,7 @@ export function Wonderland() {
           <ChevronLeft className="size-3 max-sm:size-4" aria-hidden="true" />
           <span className="max-sm:sr-only">{UI.home}</span>
         </button>
-        <span className="pointer-events-none absolute left-1/2 top-[clamp(18px,3.2vw,30px)] -translate-x-1/2 whitespace-nowrap font-label text-sm font-light tracking-[0.32em] [text-shadow:0_1px_14px_rgba(0,0,0,0.6)] max-sm:top-7 sm:text-base sm:tracking-[0.45em]">
+        <span className="wl-wordmark pointer-events-none absolute left-1/2 top-[clamp(18px,3.2vw,30px)] -translate-x-1/2 whitespace-nowrap font-label text-sm font-light tracking-[0.32em] [text-shadow:0_1px_14px_rgba(23,17,10,0.6)] max-sm:top-7 sm:text-base sm:tracking-[0.45em]">
           {BRAND.wordmark}
         </span>
         <button
@@ -494,7 +501,7 @@ export function Wonderland() {
             onClick={() => jumpTo(i)}
             aria-label={`${i + 1}. ${scene.title}`}
             aria-current={i === current}
-            className="wl-dot focus-visible:outline-2 focus-visible:outline-white"
+            className="wl-dot focus-visible:outline-2 focus-visible:outline-[var(--wl-ivory)]"
           />
         ))}
       </nav>
@@ -505,7 +512,7 @@ export function Wonderland() {
         onClick={nextSection}
         inert={stage !== 1 || hintHidden}
         data-end={hintHidden}
-        className="wl-ui wl-hint absolute bottom-[clamp(20px,4vw,48px)] left-1/2 z-30 flex -translate-x-1/2 flex-col items-center gap-1 whitespace-nowrap font-label text-[clamp(0.9rem,1.4vw,1rem)] tracking-[-0.01em] [text-shadow:0_1px_14px_rgba(0,0,0,0.95)]"
+        className="wl-ui wl-hint absolute bottom-[clamp(20px,4vw,48px)] left-1/2 z-30 flex -translate-x-1/2 flex-col items-center gap-1 whitespace-nowrap font-label text-[clamp(0.9rem,1.4vw,1rem)] tracking-[-0.01em] [text-shadow:0_1px_14px_rgba(23,17,10,0.95)]"
       >
         {UI.scrollCta}
         <ArrowDown className="wl-nudge size-4" aria-hidden="true" />
@@ -517,7 +524,7 @@ export function Wonderland() {
         onClick={sound.toggle}
         aria-pressed={sound.enabled}
         aria-label={sound.enabled ? UI.soundOff : UI.soundOn}
-        className="absolute bottom-5 left-5 z-30 grid size-[47px] place-items-center rounded-full bg-[#1f1f1f] text-white transition-colors hover:bg-[#2c2c2c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        className="absolute bottom-5 left-5 z-30 grid size-[47px] place-items-center rounded-full border border-[var(--wl-ivory)]/15 bg-[rgba(var(--wl-umber-rgb),0.88)] text-[var(--wl-ivory)] transition-colors hover:bg-[var(--wl-umber)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--wl-champagne)]"
       >
         <SoundIcon className="size-[18px]" aria-hidden="true" />
       </button>
@@ -528,11 +535,11 @@ export function Wonderland() {
           role="dialog"
           aria-modal="true"
           aria-label={UI.moodboard}
-          className="absolute inset-0 z-40 grid place-items-center bg-black/70 p-6 backdrop-blur-sm"
+          className="absolute inset-0 z-40 grid place-items-center bg-[rgba(var(--wl-umber-rgb),0.74)] p-6 backdrop-blur-sm"
           onClick={() => setBoardOpen(false)}
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-white/15 bg-[#0b0b10] p-6"
+            className="w-full max-w-md rounded-2xl border border-[var(--wl-ivory)]/15 bg-[var(--wl-umber)] p-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-5 flex items-center justify-between">
@@ -542,23 +549,23 @@ export function Wonderland() {
                 autoFocus
                 onClick={() => setBoardOpen(false)}
                 aria-label={UI.moodboardClose}
-                className="grid size-8 place-items-center rounded-full hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-white"
+                className="grid size-8 place-items-center rounded-full hover:bg-[var(--wl-ivory)]/10 focus-visible:outline-2 focus-visible:outline-[var(--wl-ivory)]"
               >
                 <X className="size-4" aria-hidden="true" />
               </button>
             </div>
-            <p className="mb-4 font-label text-xs uppercase tracking-[0.14em] text-white/50">
+            <p className="mb-4 font-label text-xs uppercase tracking-[0.14em] text-[var(--wl-ivory)]/50">
               {SCENES[current].title}
             </p>
             <ul className="grid grid-cols-3 gap-4 font-label text-xs">
               {SCENES[current].swatches.map((s) => (
                 <li key={`${s.name}-${s.value}`} className="flex flex-col gap-2">
                   <span
-                    className="block aspect-square rounded-full border border-white/20"
+                    className="block aspect-square rounded-full border border-[var(--wl-ivory)]/20"
                     style={{ backgroundColor: s.value }}
                   />
                   <span>{s.name}</span>
-                  <span className="uppercase text-white/50">{s.value}</span>
+                  <span className="uppercase text-[var(--wl-ivory)]/50">{s.value}</span>
                 </li>
               ))}
             </ul>

@@ -30,7 +30,7 @@ const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 const inputClass =
-  "mt-2 w-full rounded-xl border border-white/15 bg-white/[0.04] px-4 py-3 font-label text-base text-white placeholder:text-white/35 focus:border-[#d9a441] focus:outline-none focus:ring-2 focus:ring-[#d9a441]/30 aria-[invalid=true]:border-[#ff8a9b]";
+  "mt-2 w-full rounded-xl border border-[var(--wl-ivory)]/15 bg-[var(--wl-ivory)]/[0.04] px-4 py-3 font-label text-base text-[var(--wl-ivory)] placeholder:text-[var(--wl-ivory)]/35 focus:border-[var(--wl-champagne)] focus:outline-none focus:ring-2 focus:ring-[var(--wl-champagne)]/30 aria-[invalid=true]:border-[#f0a393]";
 
 function validate(draft: Draft, minDate: string): FieldErrors {
   const f = C.fields;
@@ -89,11 +89,11 @@ function Field({
     <div className={className}>
       <label
         htmlFor={id}
-        className="block font-label text-[11px] uppercase tracking-[0.18em] text-white/60"
+        className="block font-label text-[11px] uppercase tracking-[0.18em] text-[var(--wl-ivory)]/60"
       >
         {label}
         {required && (
-          <span aria-hidden="true" className="text-[#d9a441]">
+          <span aria-hidden="true" className="text-[var(--wl-champagne)]">
             {" "}
             *
           </span>
@@ -101,7 +101,7 @@ function Field({
       </label>
       {children}
       {error && (
-        <p id={`${id}-error`} role="alert" className="mt-1.5 font-label text-xs text-[#ff8a9b]">
+        <p id={`${id}-error`} role="alert" className="mt-1.5 font-label text-xs text-[#f0a393]">
           {error}
         </p>
       )}
@@ -217,7 +217,7 @@ export function ConsultationModal({
   return (
     <div
       data-touch-scroll
-      className="absolute inset-0 z-50 overflow-y-auto bg-black/80 backdrop-blur-sm"
+      className="absolute inset-0 z-50 overflow-y-auto bg-[rgba(var(--wl-umber-rgb),0.82)] backdrop-blur-sm"
     >
       <div
         className="flex min-h-full items-center justify-center p-4 sm:p-8"
@@ -231,7 +231,7 @@ export function ConsultationModal({
           aria-modal="true"
           aria-labelledby="consult-title"
           aria-describedby="consult-intro"
-          className="relative w-full max-w-xl rounded-3xl border border-white/10 bg-[#0c0b10] p-6 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.95)] sm:p-9"
+          className="relative w-full max-w-xl rounded-3xl border border-[var(--wl-ivory)]/10 bg-[var(--wl-umber)] p-6 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.95)] sm:p-9"
         >
           {/* A zero-height sticky row spanning the panel, so the close button stays in view while a
               tall form scrolls on a phone. The negative margins cancel the panel's padding. */}
@@ -240,7 +240,7 @@ export function ConsultationModal({
               type="button"
               onClick={close}
               aria-label={C.closeLabel}
-              className="absolute right-4 top-4 grid size-9 place-items-center rounded-full border border-white/10 bg-[#0c0b10]/90 text-white/70 backdrop-blur-sm transition-colors hover:bg-[#1c1b22] hover:text-white focus-visible:outline-2 focus-visible:outline-white"
+              className="absolute right-4 top-4 grid size-9 place-items-center rounded-full border border-[var(--wl-ivory)]/10 bg-[var(--wl-umber)]/90 text-[var(--wl-ivory)]/70 backdrop-blur-sm transition-colors hover:bg-[#1c1b22] hover:text-[var(--wl-ivory)] focus-visible:outline-2 focus-visible:outline-[var(--wl-ivory)]"
             >
               <X className="size-4" aria-hidden="true" />
             </button>
@@ -248,7 +248,7 @@ export function ConsultationModal({
 
           {sentUrl ? (
             <div role="status" className="py-4 text-center">
-              <span className="mx-auto grid size-12 place-items-center rounded-full border border-[#d9a441]/60 text-[#d9a441]">
+              <span className="mx-auto grid size-12 place-items-center rounded-full border border-[var(--wl-champagne)]/60 text-[var(--wl-champagne)]">
                 <Check className="size-5" aria-hidden="true" />
               </span>
               <h3 id="consult-title" className="mt-5 font-display text-[1.9rem] font-medium">
@@ -256,7 +256,7 @@ export function ConsultationModal({
               </h3>
               <p
                 id="consult-intro"
-                className="mx-auto mt-2 max-w-sm font-label text-[0.95rem] font-light text-white/70"
+                className="mx-auto mt-2 max-w-sm font-label text-[0.95rem] font-light text-[var(--wl-ivory)]/70"
               >
                 {C.sent.body}
               </p>
@@ -265,7 +265,7 @@ export function ConsultationModal({
                 href={sentUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="wl-gold mt-6 inline-flex h-[3.1rem] items-center justify-center gap-2.5 rounded-full px-8 font-label text-[0.95rem] font-medium focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f3dfb6]"
+                className="wl-gold mt-6 inline-flex h-[3.1rem] items-center justify-center gap-2.5 rounded-full px-8 font-label text-[0.95rem] font-medium focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--wl-champagne-light)]"
               >
                 <MessageCircle className="size-[1.15rem]" aria-hidden="true" />
                 {C.sent.linkLabel}
@@ -274,7 +274,7 @@ export function ConsultationModal({
               <button
                 type="button"
                 onClick={close}
-                className="mt-3 block w-full font-label text-sm text-white/60 underline-offset-4 transition-colors hover:text-white hover:underline focus-visible:outline-2 focus-visible:outline-white"
+                className="mt-3 block w-full font-label text-sm text-[var(--wl-ivory)]/60 underline-offset-4 transition-colors hover:text-[var(--wl-ivory)] hover:underline focus-visible:outline-2 focus-visible:outline-[var(--wl-ivory)]"
               >
                 {C.closeLabel}
               </button>
@@ -287,7 +287,7 @@ export function ConsultationModal({
               >
                 {C.title}
               </h3>
-              <p id="consult-intro" className="mt-2 font-label text-[0.95rem] font-light text-white/65">
+              <p id="consult-intro" className="mt-2 font-label text-[0.95rem] font-light text-[var(--wl-ivory)]/65">
                 {C.intro}
               </p>
 
@@ -380,7 +380,7 @@ export function ConsultationModal({
                 </Field>
 
                 <fieldset className="sm:col-span-2">
-                  <legend className="font-label text-[11px] uppercase tracking-[0.18em] text-white/60">
+                  <legend className="font-label text-[11px] uppercase tracking-[0.18em] text-[var(--wl-ivory)]/60">
                     {f.services.label}
                   </legend>
                   <div className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -397,17 +397,17 @@ export function ConsultationModal({
                             className="peer sr-only"
                           />
                           <span
-                            className={`flex w-full items-center gap-2.5 rounded-xl border px-3.5 py-2.5 font-label text-sm transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-[#d9a441]/70 ${
+                            className={`flex w-full items-center gap-2.5 rounded-xl border px-3.5 py-2.5 font-label text-sm transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--wl-champagne)]/70 ${
                               on
-                                ? "border-[#d9a441] bg-[#d9a441]/10 text-white"
-                                : "border-white/15 bg-white/[0.03] text-white/75 hover:border-white/30"
+                                ? "border-[var(--wl-champagne)] bg-[var(--wl-champagne)]/10 text-[var(--wl-ivory)]"
+                                : "border-[var(--wl-ivory)]/15 bg-[var(--wl-ivory)]/[0.03] text-[var(--wl-ivory)]/75 hover:border-[var(--wl-ivory)]/30"
                             }`}
                           >
                             <span
                               className={`grid size-[1.05rem] shrink-0 place-items-center rounded-[5px] border transition-colors ${
                                 on
-                                  ? "border-[#d9a441] bg-[#d9a441] text-[#1a1208]"
-                                  : "border-white/30"
+                                  ? "border-[var(--wl-champagne)] bg-[var(--wl-champagne)] text-[#20170b]"
+                                  : "border-[var(--wl-ivory)]/30"
                               }`}
                             >
                               {on && <Check className="size-3" strokeWidth={3} aria-hidden="true" />}
@@ -424,12 +424,12 @@ export function ConsultationModal({
               <div className="mt-7">
                 <button
                   type="submit"
-                  className="wl-gold inline-flex h-[3.1rem] w-full items-center justify-center gap-2.5 rounded-full font-label text-[0.95rem] font-medium focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f3dfb6]"
+                  className="wl-gold inline-flex h-[3.1rem] w-full items-center justify-center gap-2.5 rounded-full font-label text-[0.95rem] font-medium focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--wl-champagne-light)]"
                 >
                   <MessageCircle className="size-[1.15rem]" aria-hidden="true" />
                   {C.submitLabel}
                 </button>
-                <p className="mt-3 text-center font-label text-xs font-light text-white/45">
+                <p className="mt-3 text-center font-label text-xs font-light text-[var(--wl-ivory)]/45">
                   {C.privacyNote}
                 </p>
               </div>

@@ -46,14 +46,14 @@ export function ShowpieceScene({
       )}
 
       {/* Copy: bottom-left. Each line rises in turn when the section becomes active. */}
-      <div className="wl-copy absolute bottom-[clamp(96px,17vh,180px)] left-[clamp(20px,5vw,72px)] right-[clamp(20px,5vw,72px)] max-w-2xl [text-shadow:0_2px_28px_rgba(0,0,0,0.5)]">
+      <div className="wl-copy absolute bottom-[clamp(96px,17vh,180px)] left-[clamp(20px,5vw,72px)] right-[clamp(20px,5vw,72px)] max-w-2xl [text-shadow:0_2px_28px_rgba(23,17,10,0.5)]">
         <p
-          className="font-label text-[12px] font-normal uppercase tracking-[0.22em] text-white/85"
+          className="font-label text-[12px] font-normal uppercase tracking-[0.22em] text-[var(--wl-ivory)]/85"
           style={step(0)}
         >
           {number}
-          <span className="text-white/50"> / {String(total).padStart(2, "0")}</span>
-          <span className="mx-3 inline-block h-px w-8 translate-y-[-3px] bg-white/60" />
+          <span className="text-[var(--wl-ivory)]/50"> / {String(total).padStart(2, "0")}</span>
+          <span className="mx-3 inline-block h-px w-8 translate-y-[-3px] bg-[var(--wl-ivory)]/60" />
           {section.kicker}
         </p>
         <h2
@@ -63,7 +63,7 @@ export function ShowpieceScene({
           {section.title}
         </h2>
         <p
-          className="mt-5 max-w-md font-label text-[clamp(0.95rem,1.4vw,1.15rem)] font-light leading-relaxed text-white/90"
+          className="mt-5 max-w-md font-label text-[clamp(0.95rem,1.4vw,1.15rem)] font-light leading-relaxed text-[var(--wl-ivory)]/90"
           style={step(2)}
         >
           {section.body}

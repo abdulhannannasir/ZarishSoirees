@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Geist, Geist_Mono, Jost } from "next/font/google";
+import { Cormorant_Garamond, Geist, Geist_Mono, Jost, Mrs_Saint_Delafield } from "next/font/google";
 import { BRAND } from "@/components/sites/wedding-wonderland/content";
 import "./globals.css";
 
@@ -27,10 +27,17 @@ const jost = Jost({
   weight: ["300", "400", "500"],
 });
 
+// A flowing signature script, the closest open match to the script in the brand's logo.
+const script = Mrs_Saint_Delafield({
+  variable: "--font-mrs-saint",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 export const metadata: Metadata = {
   title: `${BRAND.name} | Wedding Event Management & Decoration`,
   description:
-    "High-end, maximalist wedding event management and decoration: grand entrances, bespoke stages, floral architecture, custom table settings and lighting.",
+    "Timeless, candlelit wedding event management and decoration: grand entrances, bespoke stages, floral architecture, custom table settings and lighting.",
 };
 
 export default function RootLayout({
@@ -41,7 +48,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} ${jost.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${cormorant.variable} ${jost.variable} ${script.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

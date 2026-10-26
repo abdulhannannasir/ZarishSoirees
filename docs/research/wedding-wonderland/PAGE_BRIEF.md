@@ -27,29 +27,34 @@ interaction. Fonts are open stand-ins (Cormorant Garamond, Jost), not the source
 
 | # | Hash | Title | Photo (desktop / phone) |
 | --- | --- | --- | --- |
-| – | `/` | Hero: "Step into the Extraordinary." | none, black stage with cut-out blooms |
-| 1 | `#grand-entrances` | Grand Entrances | `grand-entrance-vibrant.jpg` / `…-mobile.jpg` |
-| 2 | `#bespoke-stage-backdrop` | Bespoke Stage & Backdrop Design | `bespoke-stage-backdrop.jpg` / `…-mobile.jpg` |
-| 3 | `#floral-architecture` | Floral Architecture | `floral-architecture-hanging.jpg` / `…-mobile.jpg` |
-| 4 | `#custom-table-settings` | Custom Table Settings | `custom-table-setting.jpg` / `…-mobile.jpg` |
-| 5 | `#lighting-ambience` | Lighting & Ambience | `lighting-ambience-canopy.jpg` / `…-mobile.jpg` |
-| 6 | `#meet-the-founder` | Meet the Founder & Book a Consultation (finale) | `founder-portrait.jpg` (4:5, arch frame) / `founder-portrait-mobile.jpg` (3:5, full-bleed) |
+| – | `/` | Hero: "Softly lit. Forever yours." | `images/hero-drapes.jpg` (sheer ivory drapes), with cut-out roses and baby's breath |
+| 1 | `#grand-entrances` | Grand Entrances | `images/grand-entrance.jpg` / `…-mobile.jpg` |
+| 2 | `#bespoke-stage-backdrop` | Bespoke Stage & Backdrop Design | `images/bespoke-stage.jpg` / `…-mobile.jpg` |
+| 3 | `#floral-architecture` | Floral Architecture | `images/floral-architecture.jpg` / `…-mobile.jpg` |
+| 4 | `#custom-table-settings` | Custom Table Settings | `images/custom-table.jpg` / `…-mobile.jpg` |
+| 5 | `#lighting-ambience` | Lighting & Ambience | `images/lighting-ambience.jpg` (phones reuse it; no portrait crop yet) |
+| 6 | `#meet-the-founder` | Meet the Founder & Book a Consultation (finale) | `images/finale-logo-table.jpg` (the brand's logo photo, 4:5; fills the arch on desktop, top 86% of the screen on phones) |
+
+All photos under `images/` are AI-generated (Figma, `gemini-3.1-flash-image`), 1376 px renders
+upscaled to 2400 px with a light film grain. The Figma file "The Wed Theory - website photos" holds
+the originals. The palette lives in one block of CSS variables at the top of `wonderland.css`.
 
 ## Interaction model (carried over from the structural reference)
 
 Single `100dvh` screen, no document scroll. **The hash is the destination of Enter**: a hash
 present at load still shows the hero, and Enter lands in that section.
 
-1. **Hero** — black, drifting cut-out blooms at the corners. Eyebrow → two-line uppercase
-   headline → italic tagline → white **Enter** pill → greeting line. Wordmark top-centre,
-   round sound toggle bottom-left.
+1. **Hero** — light: sheer ivory drapes with drifting cut-out roses and baby's breath at the
+   corners. Script brand name → two-line uppercase headline → italic tagline → dark **Enter** pill
+   → greeting line. Wordmark top-centre (sage on the hero, ivory afterwards), round sound toggle
+   bottom-left. The drapes dissolve on Enter to reveal the first section.
 2. **Enter (~3.4 s)** — everything but the headline fades; the headline scales past the viewport
    (camera push) while the blooms fly outward; section 1 rises behind it, dim and oversized.
 3. **Sections** — each is a full-bleed photo with a legibility gradient, floating blooms, and a
    bottom-left copy block (index, kicker, title, body) that rises in line by line.
 4. **Moving between sections** — the active section zooms past the viewer while the next rises
    from the distance; going back reverses it. Triggered by wheel/arrows past the end of a section,
-   a swipe on touch screens, the "Scroll to explore the magic" button, the section dots, or the hash.
+   a swipe on touch screens, the "Scroll to explore" button, the section dots, or the hash.
 5. **Finale (scene 6)** — a dark stage instead of a full-bleed photo. Eyebrow "06 / 06 — Begin
    the Journey", the headline "Let’s create your extraordinary.", the founder's name, role and a
    short bio, then two buttons: a gold **Chat on WhatsApp** link and an outlined **Schedule a
@@ -154,14 +159,20 @@ outside the scenes because their transforms would break its positioning.
 ## Known gaps
 
 - The founder's name ("Zarish"), role and bio are placeholders: edit `FINALE.founder` in `content.ts`.
-- `founder-portrait-mobile.jpg` is a real photo, but the desktop `founder-portrait.jpg` is still a
-  generated placeholder, so phones and desktops currently show different pictures.
+- The finale shows the brand's logo photo, not a photo of the founder (the founder's own night photo is
+  still at `placeholders/founder-portrait-mobile.jpg` if it is wanted back). The logo is baked into
+  the top third of the photo, so on phones the copy must stay below it: the photo stops at 86% of the
+  screen height and fades out, the bio shrinks to two lines under 790 px of height and is hidden under
+  700 px. Check this again if the photo or the copy changes.
+- Lighting & Ambience has no portrait crop for phones: it reuses the landscape photo (it crops well
+  because the chandelier is centred). A dedicated 9:16 render would be sharper.
 - The consultation form hands off to WhatsApp instead of saving anything. A request only reaches
   the studio if the visitor presses send there; to capture every enquiry, add a server-side route
   (email or CRM, with spam protection). The WhatsApp number is public in the page source, as it
   is for any `wa.me` link.
-- Placeholders are gradients, not photographs. Real photos will change how well the scrim holds:
-  check very bright images (white linen, daylight) and raise the scrim in `wonderland.css` if needed.
+- The scrim in `wonderland.css` is a warm umber wash tuned to the current AI photos (the stage photo
+  is also darkened in the file itself). Check any very bright replacement (white linen, daylight)
+  and raise the scrim if the copy gets hard to read.
 - All six scenes' photos load up front (they are stacked in the page) so transitions never wait on
   the network. With heavy photography, consider lazy-loading scenes 3-6.
 - iOS Safari's rubber-band cannot be reproduced in the browser pane used for checking (it is
