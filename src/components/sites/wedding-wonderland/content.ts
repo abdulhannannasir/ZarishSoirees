@@ -1,8 +1,8 @@
 /**
  * Everything the visitor reads or sees lives in this file: brand, hero copy, UI labels, the five
  * showpiece sections, the finale (founder profile, WhatsApp link and consultation form), their
- * photos and their moodboard palettes. To reskin or translate the site, edit this file only. No
- * component needs to change.
+ * photos and their moodboard pictures and palettes. To reskin or translate the site, edit this
+ * file only. No component needs to change.
  *
  * PHOTO RULES THAT APPLY TO EVERY SECTION
  * - Each section is a full-bleed background. It is cover-cropped to the screen, so the edges of
@@ -48,6 +48,13 @@ export type Photo = {
 
 export type Swatch = { name: string; value: string };
 
+/**
+ * A picture on the moodboard. Any landscape or portrait photo under /public works; it is
+ * cover-cropped, `focus` (CSS object-position) picks which part stays in frame. Tiles are small,
+ * so a 1200 px wide file is plenty.
+ */
+export type MoodPicture = Pick<Photo, "src" | "alt" | "focus">;
+
 export type Section = {
   /** URL hash that selects this section (/#grand-entrances). Lowercase, no spaces. */
   id: string;
@@ -57,6 +64,11 @@ export type Section = {
   /** Two or three short sentences. Keep it under ~150 characters so it reads in one glance. */
   body: string;
   photo: Photo;
+  /**
+   * Pictures shown in the moodboard panel while this section is open. Use three: the first is
+   * drawn wide (16:9), the other two as squares beneath it. Start with this section's own look.
+   */
+  moodboard: readonly MoodPicture[];
   /** Palette shown in the moodboard panel while this section is open. */
   swatches: readonly Swatch[];
   /** Changes the shape of the foreground blooms. Any whole number. */
@@ -106,6 +118,45 @@ export const UI = {
 /** Whether the original cut-out blooms float over each photo. Set to false for photos only. */
 export const FOREGROUND_BLOOMS = true;
 
+/**
+ * The pictures the moodboards draw from, defined once so each scene below just picks three. They
+ * reuse the section photos; to give a scene its own moodboard shots, add a picture here (or write
+ * one inline in that scene's `moodboard`).
+ */
+const MOOD = {
+  aisle: {
+    src: "/images/grand-entrance.jpg",
+    alt: "Candlelit aisle leading to an arch of white roses and baby's breath",
+    focus: "50% 50%",
+  },
+  stage: {
+    src: "/images/bespoke-stage.jpg",
+    alt: "Ceremony stage with an arch of white roses and floor-length ivory drapes",
+    focus: "50% 50%",
+  },
+  floral: {
+    src: "/images/floral-architecture.jpg",
+    alt: "Suspended installation of white roses, baby's breath and sage foliage above a candlelit table",
+    focus: "60% 35%",
+  },
+  table: {
+    src: "/images/custom-table.jpg",
+    alt: "Long candlelit table with ivory linen, tall tapers and white rose centrepieces",
+    focus: "60% 50%",
+  },
+  lights: {
+    src: "/images/lighting-ambience.jpg",
+    alt: "Reception hall with a crystal chandelier and a canopy of warm fairy lights",
+    focus: "50% 50%",
+  },
+  // 4:5 photo with the logo in its top third: the focus keeps the logo in a wide or square crop.
+  logo: {
+    src: "/images/finale-logo-table.jpg",
+    alt: `The ${BRAND.name} Events logo above a candlelit table of white roses and baby's breath`,
+    focus: "50% 14%",
+  },
+} satisfies Record<string, MoodPicture>;
+
 export const SECTIONS: readonly Section[] = [
   {
     id: "grand-entrances",
@@ -130,6 +181,7 @@ export const SECTIONS: readonly Section[] = [
       { name: "Baby’s Breath", value: "#fdfaf3" },
       { name: "Umber", value: "#2b2215" },
     ],
+    moodboard: [MOOD.aisle, MOOD.floral, MOOD.table],
     bloomSeed: 101,
   },
   {
@@ -155,6 +207,7 @@ export const SECTIONS: readonly Section[] = [
       { name: "Spotlight", value: "#f3dfb0" },
       { name: "Mahogany", value: "#4a3524" },
     ],
+    moodboard: [MOOD.stage, MOOD.aisle, MOOD.lights],
     bloomSeed: 202,
   },
   {
@@ -180,6 +233,7 @@ export const SECTIONS: readonly Section[] = [
       { name: "Cream", value: "#ecdfc6" },
       { name: "Candlelight", value: "#e6c58b" },
     ],
+    moodboard: [MOOD.floral, MOOD.stage, MOOD.table],
     bloomSeed: 303,
   },
   {
@@ -205,6 +259,7 @@ export const SECTIONS: readonly Section[] = [
       { name: "Sage", value: "#97a281" },
       { name: "Umber", value: "#2b2215" },
     ],
+    moodboard: [MOOD.table, MOOD.floral, MOOD.lights],
     bloomSeed: 404,
   },
   {
@@ -228,6 +283,7 @@ export const SECTIONS: readonly Section[] = [
       { name: "Silk", value: "#efe6d6" },
       { name: "Umber", value: "#2b2215" },
     ],
+    moodboard: [MOOD.lights, MOOD.table, MOOD.aisle],
     bloomSeed: 505,
   },
 ];
@@ -300,6 +356,8 @@ export type Finale = {
       services: { label: string; options: readonly string[] };
     };
   };
+  /** Pictures shown in the moodboard panel while the finale is open. Use three, as in `Section`. */
+  moodboard: readonly MoodPicture[];
   /** Palette shown in the moodboard panel while the finale is open. */
   swatches: readonly Swatch[];
   /** Changes the shape of the foreground blooms. Any whole number. */
@@ -394,11 +452,17 @@ export const FINALE: Finale = {
     { name: "Bronze", value: "#987558" },
     { name: "Candlelight", value: "#e9c88f" },
   ],
+  moodboard: [MOOD.logo, MOOD.lights, MOOD.floral],
   bloomSeed: 606,
 };
 
 /** What every scene (the five showpieces and the finale) offers to navigation and the moodboard. */
-export type SceneMeta = { id: string; title: string; swatches: readonly Swatch[] };
+export type SceneMeta = {
+  id: string;
+  title: string;
+  moodboard: readonly MoodPicture[];
+  swatches: readonly Swatch[];
+};
 
 /** Every scene in scroll order. The finale is always last. */
 export const SCENES: readonly SceneMeta[] = [...SECTIONS, FINALE];

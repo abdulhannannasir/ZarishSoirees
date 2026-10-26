@@ -529,46 +529,69 @@ export function Wonderland() {
         <SoundIcon className="size-[18px]" aria-hidden="true" />
       </button>
 
-      {/* Moodboard: the current scene's palette */}
+      {/* Moodboard: the current scene's pictures and palette. The overlay scrolls (and keeps native
+          touch scrolling, see `data-touch-scroll`) because the panel can be taller than a phone. */}
       {boardOpen && (
         <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={UI.moodboard}
-          className="absolute inset-0 z-40 grid place-items-center bg-[rgba(var(--wl-umber-rgb),0.74)] p-6 backdrop-blur-sm"
-          onClick={() => setBoardOpen(false)}
+          data-touch-scroll
+          className="absolute inset-0 z-40 overflow-y-auto bg-[rgba(var(--wl-umber-rgb),0.74)] backdrop-blur-sm"
         >
           <div
-            className="w-full max-w-md rounded-2xl border border-[var(--wl-ivory)]/15 bg-[var(--wl-umber)] p-6"
-            onClick={(e) => e.stopPropagation()}
+            className="flex min-h-full items-center justify-center p-4 sm:p-6"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) setBoardOpen(false);
+            }}
           >
-            <div className="mb-5 flex items-center justify-between">
-              <h3 className="font-display text-2xl font-medium">{UI.moodboard}</h3>
-              <button
-                type="button"
-                autoFocus
-                onClick={() => setBoardOpen(false)}
-                aria-label={UI.moodboardClose}
-                className="grid size-8 place-items-center rounded-full hover:bg-[var(--wl-ivory)]/10 focus-visible:outline-2 focus-visible:outline-[var(--wl-ivory)]"
-              >
-                <X className="size-4" aria-hidden="true" />
-              </button>
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label={UI.moodboard}
+              className="w-full max-w-lg rounded-2xl border border-[var(--wl-ivory)]/15 bg-[var(--wl-umber)] p-5 sm:p-6"
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="font-display text-2xl font-medium">{UI.moodboard}</h3>
+                <button
+                  type="button"
+                  autoFocus
+                  onClick={() => setBoardOpen(false)}
+                  aria-label={UI.moodboardClose}
+                  className="grid size-8 place-items-center rounded-full hover:bg-[var(--wl-ivory)]/10 focus-visible:outline-2 focus-visible:outline-[var(--wl-ivory)]"
+                >
+                  <X className="size-4" aria-hidden="true" />
+                </button>
+              </div>
+              <p className="mb-3 font-label text-xs uppercase tracking-[0.14em] text-[var(--wl-ivory)]/50">
+                {SCENES[current].title}
+              </p>
+              {/* The first picture is wide, the rest are squares beneath it. */}
+              <ul className="mb-5 grid grid-cols-2 gap-2">
+                {SCENES[current].moodboard.map((picture, i) => (
+                  <li
+                    key={picture.src}
+                    className={`relative overflow-hidden rounded-xl bg-[var(--wl-ivory)]/10 ${
+                      i === 0 ? "col-span-2 aspect-video" : "aspect-square"
+                    }`}
+                  >
+                    <Photo
+                      photo={picture}
+                      sizes={i === 0 ? "(max-width: 540px) 90vw, 480px" : "(max-width: 540px) 45vw, 240px"}
+                    />
+                  </li>
+                ))}
+              </ul>
+              <ul className="grid grid-cols-3 gap-4 font-label text-xs">
+                {SCENES[current].swatches.map((s) => (
+                  <li key={`${s.name}-${s.value}`} className="flex flex-col gap-2">
+                    <span
+                      className="block aspect-square rounded-full border border-[var(--wl-ivory)]/20"
+                      style={{ backgroundColor: s.value }}
+                    />
+                    <span>{s.name}</span>
+                    <span className="uppercase text-[var(--wl-ivory)]/50">{s.value}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="mb-4 font-label text-xs uppercase tracking-[0.14em] text-[var(--wl-ivory)]/50">
-              {SCENES[current].title}
-            </p>
-            <ul className="grid grid-cols-3 gap-4 font-label text-xs">
-              {SCENES[current].swatches.map((s) => (
-                <li key={`${s.name}-${s.value}`} className="flex flex-col gap-2">
-                  <span
-                    className="block aspect-square rounded-full border border-[var(--wl-ivory)]/20"
-                    style={{ backgroundColor: s.value }}
-                  />
-                  <span>{s.name}</span>
-                  <span className="uppercase text-[var(--wl-ivory)]/50">{s.value}</span>
-                </li>
-              ))}
-            </ul>
           </div>
         </div>
       )}

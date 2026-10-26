@@ -13,7 +13,7 @@ interaction. Fonts are open stand-ins (Cormorant Garamond, Jost), not the source
 
 | Want to change | Edit |
 | --- | --- |
-| Any text, image path, alt text, palette, hash id, WhatsApp link, founder bio, form fields | `src/components/sites/wedding-wonderland/content.ts` |
+| Any text, image path, alt text, palette, moodboard pictures (`MOOD` and each scene's `moodboard`), hash id, WhatsApp link, founder bio, form fields | `src/components/sites/wedding-wonderland/content.ts` |
 | Placeholder images | `npm run placeholders` (reads `content.ts`; skips files that already exist, `-- --force` overwrites them), or drop real files in `public/` |
 | Scene logic, scrolling, sound, header | `wonderland.tsx` |
 | Section layout (photo, scrim, copy block) | `showpiece-scene.tsx` |
