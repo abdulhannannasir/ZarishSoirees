@@ -14,7 +14,8 @@ export function Photo({
   priority = false,
   sizes = "100vw",
 }: {
-  photo: PhotoSpec;
+  /** Only what is drawn is needed, so a moodboard picture (no `brief`) works as well as a scene photo. */
+  photo: Pick<PhotoSpec, "src" | "mobileSrc" | "alt" | "focus">;
   priority?: boolean;
   /** How wide the photo is drawn, so the browser picks a right-sized file. Full width by default. */
   sizes?: string;

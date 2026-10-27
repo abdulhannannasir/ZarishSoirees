@@ -1,8 +1,8 @@
 /**
  * Everything the visitor reads or sees lives in this file: brand, hero copy, UI labels, the five
  * showpiece sections, the finale (founder profile, WhatsApp link and consultation form), their
- * photos and their moodboard palettes. To reskin or translate the site, edit this file only. No
- * component needs to change.
+ * photos and their moodboard pictures and palettes. To reskin or translate the site, edit this
+ * file only. No component needs to change.
  *
  * PHOTO RULES THAT APPLY TO EVERY SECTION
  * - Each section is a full-bleed background. It is cover-cropped to the screen, so the edges of
@@ -21,7 +21,8 @@
  *   file that exists, so your real photos are safe; add `-- --force` to regenerate on purpose.
  *
  * FINALE PORTRAIT (FINALE.founder.portrait)
- * - A portrait photo of the founder, not a landscape scene. Phones show `mobileSrc` full-bleed
+ * - A portrait photo, not a landscape scene (today the brand's logo photo; it can be a photo of
+ *   the founder instead). Phones show `mobileSrc` full-bleed
  *   (3:5, at least 1200 x 2000 px) with the text over its lower half, so keep the head and
  *   shoulders in the upper-middle of the frame and the lower half calm and dark.
  * - Larger screens frame `src` in an arch beside the text (4:5, at least 1600 x 2000 px): keep the
@@ -47,6 +48,13 @@ export type Photo = {
 
 export type Swatch = { name: string; value: string };
 
+/**
+ * A picture on the moodboard. Any landscape or portrait photo under /public works; it is
+ * cover-cropped, `focus` (CSS object-position) picks which part stays in frame. Tiles are small,
+ * so a 1200 px wide file is plenty.
+ */
+export type MoodPicture = Pick<Photo, "src" | "alt" | "focus">;
+
 export type Section = {
   /** URL hash that selects this section (/#grand-entrances). Lowercase, no spaces. */
   id: string;
@@ -56,6 +64,11 @@ export type Section = {
   /** Two or three short sentences. Keep it under ~150 characters so it reads in one glance. */
   body: string;
   photo: Photo;
+  /**
+   * Pictures shown in the moodboard panel while this section is open. Use three: the first is
+   * drawn wide (16:9), the other two as squares beneath it. Start with this section's own look.
+   */
+  moodboard: readonly MoodPicture[];
   /** Palette shown in the moodboard panel while this section is open. */
   swatches: readonly Swatch[];
   /** Changes the shape of the foreground blooms. Any whole number. */
@@ -63,24 +76,46 @@ export type Section = {
 };
 
 export const BRAND = {
-  name: "Zarish Soirées",
+  name: "The Wed Theory",
   /** Shown top-centre. Lowercase looks best with the wide letter-spacing. */
-  wordmark: "zarish soirées",
+  wordmark: "the wed theory",
 } as const;
 
+/**
+ * Sheer ivory drapes behind the hero. Keep it light and low-contrast: the type on top is dark
+ * ink. It is cover-cropped, so on phones the middle of the photo is what shows.
+ */
+const HERO_BACKDROP: Photo = {
+  src: "/images/hero-drapes.jpg",
+  alt: "",
+  focus: "50% 50%",
+  brief: "Sheer ivory silk drapes in soft light, calm and empty in the centre",
+};
+
 export const HERO = {
-  eyebrow: `${BRAND.name} presents`,
-  /** Two display lines. Keep each short enough to fit one line on a phone. */
-  headline: ["Step into the", "Extraordinary."],
-  tagline: "Your perfect day, reimagined as a masterpiece.",
+  /**
+   * The brand's logo (TWT monogram, script name, EVENTS), the one big mark in the hero. A PNG with a
+   * transparent background so it sits on the drapes; ink is sage and charcoal, so keep the backdrop light.
+   * To use a new logo, swap the file (same name) or point `src` at it and update `width` and `height`.
+   */
+  logo: {
+    src: "/images/twt-logo.png",
+    /** The file's size in pixels. Only used to reserve space and keep its proportions, not its drawn size. */
+    width: 1600,
+    height: 612,
+    /** Read out by screen readers: it is the page's main heading. */
+    alt: `${BRAND.name} Events`,
+  },
+  tagline: "Quiet luxury, designed around your love story.",
   /** The button label. */
   enterLabel: "Enter",
   /** Small line under the button (replaces the "Sound on" label). */
-  greeting: "Enter the Wonderland",
+  greeting: "Step inside the theory",
+  backdrop: HERO_BACKDROP,
 } as const;
 
 export const UI = {
-  scrollCta: "Scroll to explore the magic",
+  scrollCta: "Scroll to explore",
   home: "Home",
   moodboard: "Moodboard",
   moodboardClose: "Close moodboard",
@@ -92,130 +127,172 @@ export const UI = {
 /** Whether the original cut-out blooms float over each photo. Set to false for photos only. */
 export const FOREGROUND_BLOOMS = true;
 
+/**
+ * The pictures the moodboards draw from, defined once so each scene below just picks three. They
+ * reuse the section photos; to give a scene its own moodboard shots, add a picture here (or write
+ * one inline in that scene's `moodboard`).
+ */
+const MOOD = {
+  aisle: {
+    src: "/images/grand-entrance.jpg",
+    alt: "Candlelit aisle leading to an arch of white roses and baby's breath",
+    focus: "50% 50%",
+  },
+  stage: {
+    src: "/images/bespoke-stage.jpg",
+    alt: "Ceremony stage with an arch of white roses and floor-length ivory drapes",
+    focus: "50% 50%",
+  },
+  floral: {
+    src: "/images/floral-architecture.jpg",
+    alt: "Suspended installation of white roses, baby's breath and sage foliage above a candlelit table",
+    focus: "60% 35%",
+  },
+  table: {
+    src: "/images/custom-table.jpg",
+    alt: "Long candlelit table with ivory linen, tall tapers and white rose centrepieces",
+    focus: "60% 50%",
+  },
+  lights: {
+    src: "/images/lighting-ambience.jpg",
+    alt: "Reception hall with a crystal chandelier and a canopy of warm fairy lights",
+    focus: "50% 50%",
+  },
+  // 4:5 photo with the logo in its top third: the focus keeps the logo in a wide or square crop.
+  logo: {
+    src: "/images/finale-logo-table.jpg",
+    alt: `The ${BRAND.name} Events logo above a candlelit table of white roses and baby's breath`,
+    focus: "50% 14%",
+  },
+} satisfies Record<string, MoodPicture>;
+
 export const SECTIONS: readonly Section[] = [
   {
     id: "grand-entrances",
     kicker: "The first hello",
     title: "Grand Entrances",
-    body: "Arrive inside a bloom. Archways erupt in colour, walkways glow underfoot, and the first step becomes a procession nobody forgets.",
+    body: "Arrive between walls of white roses and sheer drapery. Candlelit aisles and a glow underfoot turn the first step into a moment nobody forgets.",
     photo: {
       // Wide and symmetrical: a vanishing-point aisle or an archway centred in frame.
       // Keep the floor/aisle in the lower third, but leave the bottom-left calm for the text.
-      src: "/placeholders/grand-entrance-vibrant.jpg",
+      src: "/images/grand-entrance.jpg",
       // Portrait crop: archway centred, full height of the arch visible.
-      mobileSrc: "/placeholders/grand-entrance-vibrant-mobile.jpg",
-      alt: "Vibrant floral archway entrance",
+      mobileSrc: "/images/grand-entrance-mobile.jpg",
+      alt: "Candlelit ceremony aisle leading to an arch of white roses and baby's breath",
       focus: "50% 55%",
-      brief: "Vibrant floral archway + aisle, symmetrical, arch centred",
+      brief: "Candlelit aisle to an arch of white roses and baby's breath, symmetrical, arch centred",
     },
     swatches: [
-      { name: "Peony", value: "#e8457b" },
-      { name: "Marigold", value: "#f6a821" },
-      { name: "Fern", value: "#2f8f5b" },
-      { name: "Blush", value: "#f8c9d4" },
-      { name: "Plum", value: "#5a1a4a" },
-      { name: "Ivory", value: "#fff4e3" },
+      { name: "Ivory", value: "#f6efe3" },
+      { name: "Champagne", value: "#dcc7a1" },
+      { name: "Eucalyptus", value: "#8b9378" },
+      { name: "Candlelight", value: "#e9c88f" },
+      { name: "Baby’s Breath", value: "#fdfaf3" },
+      { name: "Umber", value: "#2b2215" },
     ],
+    moodboard: [MOOD.aisle, MOOD.floral, MOOD.table],
     bloomSeed: 101,
   },
   {
     id: "bespoke-stage-backdrop",
     kicker: "Where every eye lands",
     title: "Bespoke Stage & Backdrop Design",
-    body: "We build the focal point from nothing: sculpted arches, mirrored horizons, skies painted just for you. Your vows, spoken inside a work of art.",
+    body: "Sculpted arches wrapped in roses, silk that falls like a waterfall, a warm light painted just for you. Your vows, spoken inside a work of art.",
     photo: {
       // The stage fills the middle of a wide frame. Leave the top third relatively clear:
       // the header and the section dots sit there.
-      src: "/placeholders/bespoke-stage-backdrop.jpg",
+      src: "/images/bespoke-stage.jpg",
       // Portrait crop: the backdrop's centre piece, as tall as possible.
-      mobileSrc: "/placeholders/bespoke-stage-backdrop-mobile.jpg",
-      alt: "Bespoke wedding stage with a sculptural, colourful backdrop",
+      mobileSrc: "/images/bespoke-stage-mobile.jpg",
+      alt: "Ceremony stage with an arch of white roses and floor-length ivory drapes",
       focus: "50% 45%",
-      brief: "Custom stage / backdrop, architectural focal point, centred",
+      brief: "Rose-covered arch against ivory silk drapes, architectural focal point, centred",
     },
     swatches: [
-      { name: "Midnight", value: "#14123a" },
-      { name: "Gilt", value: "#d9a441" },
-      { name: "Rose Quartz", value: "#f2a7b8" },
-      { name: "Jade", value: "#1f8a70" },
-      { name: "Ember", value: "#e2683f" },
-      { name: "Pearl", value: "#f4efe6" },
+      { name: "Silk", value: "#f1e9dc" },
+      { name: "Gypsophila", value: "#fdfaf3" },
+      { name: "Eucalyptus", value: "#97a281" },
+      { name: "Bronze", value: "#b58b67" },
+      { name: "Spotlight", value: "#f3dfb0" },
+      { name: "Mahogany", value: "#4a3524" },
     ],
+    moodboard: [MOOD.stage, MOOD.aisle, MOOD.lights],
     bloomSeed: 202,
   },
   {
     id: "floral-architecture",
     kicker: "Blooms that forgot gravity",
     title: "Floral Architecture",
-    body: "Cascades pour from the ceiling. Clouds of petals hang in mid-air. The whole room feels like it is still unfolding.",
+    body: "Cascades of white roses and baby’s breath pour from the ceiling. Clouds of blooms hang in mid-air, and the room feels like it is still unfolding.",
     photo: {
       // Tall hanging installations suit a 3:2 frame cropped to 16:9: shoot a little wider than you
       // need, with the installation's lowest point near the vertical centre.
-      src: "/placeholders/floral-architecture-hanging.jpg",
+      src: "/images/floral-architecture.jpg",
       // Portrait crop: this is the section that benefits most. Show the installation top to bottom.
-      mobileSrc: "/placeholders/floral-architecture-hanging-mobile.jpg",
-      alt: "Hanging floral installation suspended above the aisle",
-      focus: "50% 40%",
-      brief: "Hanging floral installation, blooms suspended mid-air",
+      mobileSrc: "/images/floral-architecture-mobile.jpg",
+      alt: "Suspended installation of white roses, baby's breath and sage foliage above a candlelit table",
+      focus: "60% 35%",
+      brief: "Hanging installation of white roses, baby's breath and sage, blooms suspended mid-air",
     },
     swatches: [
-      { name: "Delphinium", value: "#4d5bd1" },
-      { name: "Coral", value: "#ff7a5c" },
-      { name: "Lime", value: "#a9d65c" },
-      { name: "Orchid", value: "#c35bd1" },
-      { name: "Sunbeam", value: "#ffd23f" },
-      { name: "Moss", value: "#2f6b3c" },
+      { name: "Garden Rose", value: "#efe3d0" },
+      { name: "Baby’s Breath", value: "#fdfaf3" },
+      { name: "Eucalyptus", value: "#7f8b6a" },
+      { name: "Dusty Sage", value: "#a9b295" },
+      { name: "Cream", value: "#ecdfc6" },
+      { name: "Candlelight", value: "#e6c58b" },
     ],
+    moodboard: [MOOD.floral, MOOD.stage, MOOD.table],
     bloomSeed: 303,
   },
   {
     id: "custom-table-settings",
     kicker: "Luxury, up close",
     title: "Custom Table Settings",
-    body: "Linen that falls like silk. Centrepieces that burst with colour. Candlelight pooling on gilded rims, a hundred small wonders within reach.",
+    body: "Linen that falls like silk. Tall tapers glowing in glass, centrepieces of garden roses and baby’s breath, candlelight pooling on gilded rims.",
     photo: {
       // A close, shallow-depth-of-field shot reads best: one table, one centrepiece, candles
       // glowing. Place the centrepiece slightly right of centre so the text has room on the left.
-      src: "/placeholders/custom-table-setting.jpg",
+      src: "/images/custom-table.jpg",
       // Portrait crop: the centrepiece in the upper half, the place setting below it.
-      mobileSrc: "/placeholders/custom-table-setting-mobile.jpg",
-      alt: "Luxury table setting with vibrant centrepiece and glowing candles",
+      mobileSrc: "/images/custom-table-mobile.jpg",
+      alt: "Long candlelit table with ivory linen, tall tapers and white rose centrepieces",
       focus: "60% 50%",
-      brief: "Close-up luxury table: linen, centrepiece, candles, glassware",
+      brief: "Close-up luxury table: ivory linen, white rose centrepiece, tall tapers in glass, crystal",
     },
     swatches: [
-      { name: "Burgundy", value: "#7a1f35" },
-      { name: "Champagne", value: "#f3dfb6" },
-      { name: "Candle", value: "#ffd98a" },
-      { name: "Teal", value: "#12766f" },
-      { name: "Fuchsia", value: "#d6336c" },
-      { name: "Linen", value: "#f7f1e6" },
+      { name: "Linen", value: "#efe6d6" },
+      { name: "Taper", value: "#f3e6c8" },
+      { name: "Gilt", value: "#c9a96e" },
+      { name: "Garden Rose", value: "#f4ecdd" },
+      { name: "Sage", value: "#97a281" },
+      { name: "Umber", value: "#2b2215" },
     ],
+    moodboard: [MOOD.table, MOOD.floral, MOOD.lights],
     bloomSeed: 404,
   },
   {
     id: "lighting-ambience",
     kicker: "The room, in a mood",
     title: "Lighting & Ambience",
-    body: "Fairy-light canopies shimmer overhead. Spotlights carve drama from the dark. Colour washes the night in rose, saffron and midnight blue.",
+    body: "Crystal chandeliers and canopies of fairy lights shimmer overhead. Candelabras glow, silk catches the light, and the whole night turns to amber.",
     photo: {
       // Dark, moody and wide. Light sources can be in the top half: the dark lower part keeps the
       // text readable without any extra darkening.
-      src: "/placeholders/lighting-ambience-canopy.jpg",
-      // Portrait crop: the canopy of lights across the top two thirds.
-      mobileSrc: "/placeholders/lighting-ambience-canopy-mobile.jpg",
-      alt: "Fairy-light canopy and colour-washed reception hall",
+      src: "/images/lighting-ambience.jpg",
+      alt: "Reception hall with a crystal chandelier and a canopy of warm fairy lights",
       focus: "50% 35%",
-      brief: "Fairy-light canopy, spotlights, coloured wash over the reception hall",
+      brief: "Crystal chandelier, fairy-light canopy and candelabras over an ivory-draped reception hall",
     },
     swatches: [
-      { name: "Dusk", value: "#241a4f" },
-      { name: "Saffron", value: "#ffb02e" },
-      { name: "Rose", value: "#ff5d8f" },
-      { name: "Aqua", value: "#2ec4c6" },
-      { name: "Indigo", value: "#3b36c9" },
-      { name: "Starlight", value: "#fff6d6" },
+      { name: "Candlelight", value: "#e9c88f" },
+      { name: "Crystal", value: "#f6efe3" },
+      { name: "Bronze", value: "#987558" },
+      { name: "Champagne", value: "#dcc7a1" },
+      { name: "Silk", value: "#efe6d6" },
+      { name: "Umber", value: "#2b2215" },
     ],
+    moodboard: [MOOD.lights, MOOD.table, MOOD.aisle],
     bloomSeed: 505,
   },
 ];
@@ -257,6 +334,16 @@ export type Finale = {
     /** Read out to screen readers after the label. */
     newTabNote: string;
   };
+  instagram: {
+    /** https://www.instagram.com/<handle without the @>/ */
+    url: string;
+    /** Shown on the page, including the @. */
+    handle: string;
+    /** Read out to screen readers before the handle. */
+    label: string;
+    /** Read out to screen readers after the handle. */
+    newTabNote: string;
+  };
   consultation: {
     /** Label on the button that opens the form. */
     buttonLabel: string;
@@ -278,6 +365,8 @@ export type Finale = {
       services: { label: string; options: readonly string[] };
     };
   };
+  /** Pictures shown in the moodboard panel while the finale is open. Use three, as in `Section`. */
+  moodboard: readonly MoodPicture[];
   /** Palette shown in the moodboard panel while the finale is open. */
   swatches: readonly Swatch[];
   /** Changes the shape of the foreground blooms. Any whole number. */
@@ -296,13 +385,14 @@ export const FINALE: Finale = {
     role: `Founder, ${BRAND.name}`,
     bio: `${BRAND.name} was founded on a simple belief: a wedding should feel like stepping into the most beautiful room you have ever imagined. Every arch, bloom and candle is chosen with intention, so your day feels unmistakably yours.`,
     portrait: {
-      // The founder, head and shoulders in the upper-middle of the frame. Phones show `mobileSrc`
-      // full-bleed with the text over its lower half; larger screens frame `src` in an arch.
-      src: "/placeholders/founder-portrait.jpg",
-      mobileSrc: "/placeholders/founder-portrait-mobile.jpg",
-      alt: "The founder of Zarish Soirées, seen from behind, looking out over a city at night",
-      focus: "50% 38%",
-      brief: "Founder portrait: head and shoulders, upper-middle of the frame",
+      // The brand's own photo: a candlelit table of white roses and baby's breath with the logo
+      // above it. It is 4:5, so it fills the arch exactly; phones show it full-bleed with the copy
+      // over its lower half, and the logo sits in the clear top third. To show the founder's own
+      // photo instead, point `src` at "/placeholders/founder-portrait-mobile.jpg" and set the `alt`.
+      src: "/images/finale-logo-table.jpg",
+      alt: `The ${BRAND.name} Events logo above a candlelit table of white roses and baby's breath`,
+      focus: "50% 30%",
+      brief: "Brand photo with the logo in the top third, candlelit table below",
       desktopShape: "portrait",
     },
   },
@@ -311,13 +401,19 @@ export const FINALE: Finale = {
     label: "Chat on WhatsApp",
     newTabNote: "(opens in a new tab)",
   },
+  instagram: {
+    url: "https://www.instagram.com/thewedtheory/",
+    handle: "@thewedtheory",
+    label: "Follow us on Instagram",
+    newTabNote: "(opens in a new tab)",
+  },
   consultation: {
     buttonLabel: "Schedule a Private Consultation",
     title: "Schedule a Private Consultation",
     intro: "Tell us a little about your day and we’ll pick up the conversation on WhatsApp.",
     closeLabel: "Close",
     submitLabel: "Send via WhatsApp",
-    messageGreeting: `Hello ${BRAND.name}, I would like to schedule a private consultation.`,
+    messageGreeting: `Hello, I would like to schedule a private consultation with ${BRAND.name}.`,
     privacyNote: "Your details open in WhatsApp as a message. Nothing is stored on this website.",
     sent: {
       title: "Your request is ready",
@@ -358,18 +454,24 @@ export const FINALE: Finale = {
     },
   },
   swatches: [
-    { name: "Noir", value: "#050508" },
-    { name: "Champagne", value: "#d9a441" },
-    { name: "Ivory", value: "#fff4e3" },
-    { name: "Rose", value: "#e8457b" },
-    { name: "Plum", value: "#5a1a4a" },
-    { name: "Jade", value: "#1f8a70" },
+    { name: "Umber", value: "#17110a" },
+    { name: "Champagne", value: "#cfae72" },
+    { name: "Ivory", value: "#f6efe3" },
+    { name: "Sage", value: "#8b9378" },
+    { name: "Bronze", value: "#987558" },
+    { name: "Candlelight", value: "#e9c88f" },
   ],
+  moodboard: [MOOD.logo, MOOD.lights, MOOD.floral],
   bloomSeed: 606,
 };
 
 /** What every scene (the five showpieces and the finale) offers to navigation and the moodboard. */
-export type SceneMeta = { id: string; title: string; swatches: readonly Swatch[] };
+export type SceneMeta = {
+  id: string;
+  title: string;
+  moodboard: readonly MoodPicture[];
+  swatches: readonly Swatch[];
+};
 
 /** Every scene in scroll order. The finale is always last. */
 export const SCENES: readonly SceneMeta[] = [...SECTIONS, FINALE];
