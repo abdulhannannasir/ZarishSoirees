@@ -1,0 +1,37 @@
+{
+  "name": "zarish-remotion",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Remotion video project (React-based video rendering)",
+  "scripts": {
+    "studio": "remotion studio --port 3100",
+    "compositions": "remotion compositions src/index.ts",
+    "render": "remotion render src/index.ts SmokeTest out/smoke-test.mp4",
+    "still": "remotion still src/index.ts SmokeTest out/smoke-test.png --frame=90",
+    "browser": "remotion browser ensure",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.539",
+    "@remotion/captions": "4.0.539",
+    "@remotion/cli": "4.0.539",
+    "@remotion/google-fonts": "4.0.539",
+    "@remotion/layout-utils": "4.0.539",
+    "@remotion/media": "4.0.539",
+    "@remotion/media-utils": "4.0.539",
+    "@remotion/motion-blur": "4.0.539",
+    "@remotion/noise": "4.0.539",
+    "@remotion/paths": "4.0.539",
+    "@remotion/renderer": "4.0.539",
+    "@remotion/shapes": "4.0.539",
+    "@remotion/transitions": "4.0.539",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "remotion": "4.0.539",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "typescript": "5.9.3"
+  }
+}

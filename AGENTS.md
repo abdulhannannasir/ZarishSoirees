@@ -57,6 +57,7 @@ docs/
   research/<site>/  # Page brief, asset map, and inspection evidence
   design-references/ # Screenshots and visual references
 scripts/            # Asset download scripts
+video/              # Standalone video projects: video/hyperframes (HTML+GSAP) and video/remotion (React)
 .agents/
   skills/
     clone-website/  # Canonical cross-agent cloning workflow
@@ -64,6 +65,12 @@ scripts/            # Asset download scripts
   commands/
     clone-website.md # Thin Claude Code invocation bridge
 ```
+
+## Video Tooling
+- `video/hyperframes` (HyperFrames, HTML/GSAP) and `video/remotion` (Remotion, React) render video; FFmpeg is a system dependency.
+- Both are excluded from the app's `lint`/`typecheck`/Docker build and have their own `package.json`, lockfile and Node 22+ requirement.
+- `npm run video:setup` installs everything (idempotent); `npm run video:verify` renders both smoke tests and checks them.
+- Read `video/README.md` first. `video/hyperframes/AGENTS.md` and the globally installed `/hyperframes` skills govern composition authoring there.
 
 ## Agent Workflow
 - Edit `.agents/skills/clone-website/` for cloning-workflow changes. It is the canonical skill used by Codex, Cursor, and OpenCode.
