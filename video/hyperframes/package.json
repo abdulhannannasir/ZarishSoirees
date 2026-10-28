@@ -1,0 +1,16 @@
+{
+  "name": "zarish-hyperframes",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx --yes hyperframes@0.8.212 preview",
+    "check": "npx --yes hyperframes@0.8.212 check",
+    "render": "npx --yes hyperframes@0.8.212 render",
+    "publish": "npx --yes hyperframes@0.8.212 publish",
+    "tts": "HYPERFRAMES_PYTHON=\"$(cd .. && pwd)/.venv/bin/python\" npx --yes hyperframes@0.8.212 tts",
+    "transcribe": "npx --yes hyperframes@0.8.212 transcribe"
+  },
+  "devDependencies": {
+    "hyperframes": "0.8.212"
+  }
+}
