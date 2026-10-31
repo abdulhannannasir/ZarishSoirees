@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #0b1020; }
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        font-family: "Inter", sans-serif;
+        color: #fff;
+        background: linear-gradient(135deg, #0b1020 0%, #1b2a5c 100%);
+      }
+      #title {
+        position: absolute; left: 0; right: 0; top: 380px;
+        text-align: center; font-size: 120px; font-weight: 700; letter-spacing: -0.03em;
+        opacity: 0;
+      }
+      #subtitle {
+        position: absolute; left: 0; right: 0; top: 540px;
+        text-align: center; font-size: 44px; font-weight: 400; color: #9fb4ff;
+        opacity: 0;
+      }
+      #spinner {
+        position: absolute; left: 910px; top: 760px; width: 100px; height: 100px;
+        border-radius: 16px; background: #5b8cff;
+      }
+      #bar-track {
+        position: absolute; left: 360px; top: 940px; width: 1200px; height: 12px;
+        border-radius: 6px; background: rgba(255, 255, 255, 0.15);
+      }
+      #bar { width: 0px; height: 12px; border-radius: 6px; background: #5b8cff; }
+    </style>
+  </head>
+  <body>
+    <div data-hf-id="hf-dwub" id="root" data-composition-id="smoke-test" data-start="0" data-duration="6" data-width="1920" data-height="1080">
+      <h1 data-hf-id="hf-58jy" id="title" class="clip" data-start="0" data-duration="6" data-track-index="0">Render pipeline OK</h1>
+      <p data-hf-id="hf-sx1u" id="subtitle" class="clip" data-start="0" data-duration="6" data-track-index="1">HyperFrames &middot; GSAP &middot; FFmpeg</p>
+      <div data-hf-id="hf-xo8f" id="spinner" class="clip" data-start="0" data-duration="6" data-track-index="2"></div>
+      <div data-hf-id="hf-i3ve" id="bar-track" class="clip" data-start="0" data-duration="6" data-track-index="3"><div data-hf-id="hf-2to0" id="bar"></div></div>
+      <audio data-hf-id="hf-ljt6" id="tone" src="assets/smoke-tone.mp3" data-start="0" data-duration="6" data-volume="0.3"></audio>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#title", { opacity: 0, y: 40, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: "power3.out" }, 0.2);
+      tl.fromTo("#subtitle", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, 0.9);
+      tl.fromTo("#spinner", { rotation: 0, scale: 0.6 }, { rotation: 360, scale: 1, duration: 5, ease: "none" }, 0.5);
+      tl.fromTo("#bar", { width: 0 }, { width: 1200, duration: 5.5, ease: "none" }, 0.25);
+      window.__timelines["smoke-test"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

@@ -39,6 +39,9 @@ CLAUDE.md
 docs
 scripts
 
+# Video toolchain (Remotion / HyperFrames; large, not needed at runtime)
+video
+
 # Docker files themselves (no need to copy into image)
 Dockerfile
 docker-compose.yml
