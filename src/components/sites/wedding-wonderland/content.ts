@@ -222,7 +222,7 @@ export const SECTIONS: readonly Section[] = [
     id: "lighting-ambience",
     kicker: "The room, in a mood",
     title: "Lighting & Ambience",
-    body: "Crystal chandeliers and canopies of fairy lights shimmer overhead. Candelabras glow, silk catches the light, and the whole night turns to amber.",
+    body: "A gilded chandelier glows against deep burgundy velvet. Crystal catches the candlelight, and the whole room settles into a warm, golden hush.",
     photo: {
       // Dark, moody and wide. Light sources can be in the top half: the dark lower part keeps the
       // text readable without any extra darkening.
