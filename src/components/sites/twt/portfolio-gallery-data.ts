@@ -1,11 +1,11 @@
 /**
  * THE PORTFOLIO GALLERY'S PICTURES: every photograph the site has, gathered into one list with the
- * facts a caption needs. Nothing is written twice: the pictures come from PORTFOLIO and
+ * facts a caption needs. Nothing is written twice: the pictures come from WORK, PORTFOLIO and
  * PORTFOLIO_DETAILS (content.ts) and from the service pages' galleries (services-content.ts).
  *
  * HONESTY ABOUT THE PICTURES
- * The site does not yet hold photographs of the studio's own events. Each picture therefore carries
- * its `provenance`, and the gallery prints it in the caption ("Concept image", "Stock photo"), so no
+ * Only a few photographs are of the studio's own events so far (WORK in content.ts). Each picture
+ * therefore carries its `provenance`, and the gallery prints it in the caption ("Concept image", "Stock photo"), so no
  * visitor mistakes a stand-in for real client work. When real photography arrives, replace the file,
  * set `provenance` to "studio" for it (no label is shown) and add its `location` once the venue and
  * the client have agreed to it being named. A `location` is shown only when it is set, so nothing
@@ -13,7 +13,7 @@
  */
 
 import type { MasonryItem } from "@/components/ui/masonry-gallery";
-import { PORTFOLIO, PORTFOLIO_DETAILS } from "./content";
+import { PORTFOLIO, PORTFOLIO_DETAILS, WORK } from "./content";
 import { SERVICE_PAGES } from "./services-content";
 
 export type GalleryCategory = "weddings" | "social" | "corporate";
@@ -37,7 +37,10 @@ export interface GalleryItem {
   provenance: Provenance;
 }
 
-export const GALLERY_CATEGORIES: readonly { id: GalleryCategory; label: string }[] = [
+export const GALLERY_CATEGORIES: readonly {
+  id: GalleryCategory;
+  label: string;
+}[] = [
   { id: "weddings", label: "Weddings" },
   { id: "social", label: "Social celebrations" },
   { id: "corporate", label: "Corporate" },
@@ -52,7 +55,7 @@ export const PROVENANCE_LABEL: Record<Provenance, string | null> = {
 
 /** The notice printed above the gallery while any picture is a stand-in. */
 export const GALLERY_NOTICE =
-  "Until we add photographs from our own events, these are concept and stock images that show the kind of work we plan. Each one is labelled.";
+  "Photographs from our own events carry no label. The concept and stock images that show the kind of work we plan are labelled as such.";
 
 /** A masonry picture, whose height is relative to its width (400 is a square). */
 const fromMasonry = (
@@ -71,6 +74,22 @@ const fromMasonry = (
   eventType,
   provenance,
 });
+
+/** The studio's own photographs first, then its design concepts (see WORK in content.ts). */
+const WEDDING_WORK: GalleryItem[] = [
+  ...Object.values(WORK).filter((picture) => picture.provenance === "studio"),
+  ...Object.values(WORK).filter((picture) => picture.provenance === "concept"),
+].map((picture) => ({
+  id: `weddings-${picture.id}`,
+  src: picture.src,
+  width: picture.width,
+  height: picture.height,
+  alt: picture.alt,
+  title: picture.title,
+  category: "weddings",
+  eventType: "Wedding",
+  provenance: picture.provenance,
+}));
 
 const WEDDING_COLLECTIONS: GalleryItem[] = PORTFOLIO.items.map((item) => ({
   id: `weddings-${item.id}`,
@@ -93,7 +112,12 @@ const SOCIAL = [
     fromMasonry(item, "social", "Social event", "stock"),
   ),
   ...SERVICE_PAGES.birthdays.gallery.items.map((item) =>
-    fromMasonry({ ...item, id: `birthday-${item.id}` }, "social", "Birthday", "stock"),
+    fromMasonry(
+      { ...item, id: `birthday-${item.id}` },
+      "social",
+      "Birthday",
+      "stock",
+    ),
   ),
 ];
 
@@ -106,14 +130,15 @@ function interleave<T>(lists: readonly (readonly T[])[]): T[] {
   const longest = Math.max(...lists.map((list) => list.length));
   const mixed: T[] = [];
   for (let position = 0; position < longest; position += 1) {
-    for (const list of lists) if (position < list.length) mixed.push(list[position]);
+    for (const list of lists)
+      if (position < list.length) mixed.push(list[position]);
   }
   return mixed;
 }
 
 /** Every picture, the three kinds of celebration mixed together. */
 export const GALLERY_ITEMS: readonly GalleryItem[] = interleave([
-  [...WEDDING_COLLECTIONS, ...WEDDING_DETAILS],
+  [...WEDDING_WORK, ...WEDDING_COLLECTIONS, ...WEDDING_DETAILS],
   SOCIAL,
   CORPORATE,
 ]);

@@ -4,6 +4,7 @@ import { PORTFOLIO } from "@/components/sites/twt/content";
 import { PageIntro } from "@/components/sites/twt/page-intro";
 import { PortfolioBrowse } from "@/components/sites/twt/portfolio-browse";
 import { PortfolioGrid } from "@/components/sites/twt/portfolio-grid";
+import { SignatureWork } from "@/components/sites/twt/signature-work";
 import { TheoryBanner } from "@/components/sites/twt/theory-banner";
 import { pageMetadata } from "@/lib/metadata";
 
@@ -22,6 +23,7 @@ export default function PortfolioPage() {
         headline={PORTFOLIO.headline}
         intro={PORTFOLIO.intro}
       />
+      <SignatureWork />
       <PortfolioGrid />
       <PortfolioBrowse />
       <TheoryBanner />

@@ -13,7 +13,14 @@
 
 import type { MasonryItem } from "@/components/ui/masonry-gallery";
 import { ENQUIRY } from "@/config/business";
-import { PORTFOLIO, PORTFOLIO_DETAILS, whatsapp, type ClosingContent } from "./content";
+import {
+  PORTFOLIO,
+  PORTFOLIO_DETAILS,
+  WORK,
+  whatsapp,
+  type ClosingContent,
+  type WorkPicture,
+} from "./content";
 
 export const SERVICE_SLUGS = [
   "weddings",
@@ -76,6 +83,16 @@ const photoOf = (id: string) => {
   return item.photo;
 };
 
+/** A WORK picture as a masonry tile: 400 is a square, so the height keeps the picture's shape. */
+const workTile = (picture: WorkPicture): MasonryItem => ({
+  id: picture.id,
+  img: picture.src,
+  height: Math.round((picture.height / picture.width) * 400),
+  kicker: picture.kicker,
+  title: picture.title,
+  alt: picture.alt,
+});
+
 const WEDDINGS: ServicePageContent = {
   slug: "weddings",
   name: "Weddings",
@@ -87,7 +104,8 @@ const WEDDINGS: ServicePageContent = {
     "From the first conversation to the last dance, we plan weddings that feel unmistakably yours: the setting, the flowers, the light and every moment in between.",
   metaDescription:
     "Wedding planning and design in Lahore: ceremonies, mehndi, baraat, walima, floral architecture and day-of coordination from The Wed Theory Events.",
-  hero: photoOf("grand-entrances"),
+  // The burgundy stage with the brand's logo on its backdrop; the arch crops it to 4:5.
+  hero: { src: WORK.burgundyStage.src, alt: WORK.burgundyStage.alt, focus: "50% 45%" },
   offer: {
     kicker: "What we plan",
     title: "Every function, one story",
@@ -162,7 +180,17 @@ const WEDDINGS: ServicePageContent = {
     title: "Wedding details, up close",
     intro:
       "The textures, light and florals that make a wedding feel considered, seen a little closer.",
-    items: PORTFOLIO_DETAILS.items,
+    items: [
+      ...[
+        WORK.burgundyEntrance,
+        WORK.courtyard,
+        WORK.chandelier,
+        WORK.pearlMoodboard,
+        WORK.roseWalkway,
+        WORK.burgundyFlorals,
+      ].map(workTile),
+      ...PORTFOLIO_DETAILS.items,
+    ],
   },
   closing: {
     eyebrow: "Begin",

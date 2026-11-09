@@ -286,6 +286,114 @@ export const PORTFOLIO = {
   items: readonly PortfolioItem[];
 };
 
+/**
+ * THE STUDIO'S OWN WORK AND DESIGN CONCEPTS (files in /public/images/work)
+ * Photographs the studio supplied, cropped clear of the text that was printed on them and given the
+ * site's gentle finish. `provenance` says what each one is, and the portfolio gallery labels it:
+ * "studio" is a photograph of an event the studio created (no label), "concept" is a design concept
+ * or render (labelled "Concept image"). Set a picture to "studio" only when it shows real work.
+ *
+ * `width` and `height` are the file's size in pixels: they keep the proportions and the masonry
+ * tile heights right. The entrance photographs show the couple's names on the signage, so ask the
+ * couple before naming them anywhere else.
+ */
+export type WorkPicture = {
+  id: string;
+  src: string;
+  width: number;
+  height: number;
+  kicker: string;
+  title: string;
+  alt: string;
+  provenance: "studio" | "concept";
+};
+
+export const WORK = {
+  burgundyEntrance: {
+    id: "burgundy-entrance",
+    src: "/images/work/twt-entrance-drapes.jpg",
+    width: 1118,
+    height: 630,
+    kicker: "Entrances",
+    title: "Velvet and chandeliers",
+    alt: "A reception entrance framed in red velvet drapes, with crystal chandeliers overhead and roses lining the walkway",
+    provenance: "studio",
+  },
+  roseWalkway: {
+    id: "rose-walkway",
+    src: "/images/work/twt-entrance-walkway.jpg",
+    width: 1118,
+    height: 647,
+    kicker: "Arrival",
+    title: "A walkway of roses",
+    alt: "White columns and urns leading to red velvet curtains, with a floral fountain beyond and roses massed either side",
+    provenance: "studio",
+  },
+  chandelier: {
+    id: "crystal-chandelier",
+    src: "/images/work/twt-chandelier.jpg",
+    width: 1118,
+    height: 720,
+    kicker: "Lighting",
+    title: "Crystal and candlelight",
+    alt: "A gilded crystal chandelier glowing against burgundy velvet drapes, with pink hydrangeas at its side",
+    provenance: "studio",
+  },
+  burgundyFlorals: {
+    id: "burgundy-florals",
+    src: "/images/work/twt-burgundy-florals.jpg",
+    width: 1118,
+    height: 527,
+    kicker: "Florals",
+    title: "Burgundy in bloom",
+    alt: "Deep red, marigold and pink florals massed beneath velvet drapes",
+    provenance: "studio",
+  },
+  burgundyStage: {
+    id: "burgundy-stage",
+    src: "/images/work/concept-burgundy-stage.jpg",
+    width: 1156,
+    height: 1360,
+    kicker: "Stages",
+    title: "A burgundy stage",
+    alt: "A white sofa on a stage between banks of pink and burgundy roses, under velvet swags, crystal strands and gold chandeliers, with The Wed Theory logo on the backdrop",
+    provenance: "concept",
+  },
+  pearlMoodboard: {
+    id: "pearl-moodboard",
+    src: "/images/work/concept-pearl-moodboard.jpg",
+    width: 1199,
+    height: 1280,
+    kicker: "Mood board",
+    title: "Pearls, drapes and candlelight",
+    alt: "A mood board: a brick staircase dressed in white drapes, pearl garlands, baby’s breath, candles and brass lanterns, with an ivory, sage and gold palette",
+    provenance: "concept",
+  },
+  courtyard: {
+    id: "candlelit-courtyard",
+    src: "/images/work/concept-courtyard.jpg",
+    width: 572,
+    height: 1024,
+    kicker: "Intimate settings",
+    title: "A courtyard by candlelight",
+    alt: "An ivory sofa in a courtyard among white roses and hanging jasmine, beside a fountain scattered with petals and floating candles",
+    provenance: "concept",
+  },
+} as const satisfies Record<string, WorkPicture>;
+
+/** The portfolio's opening section: the studio's own photographs, before the design concepts. */
+export const SIGNATURE = {
+  eyebrow: "Our work",
+  headline: ["Created by", "The Wed Theory."],
+  intro:
+    "Velvet, crystal and roses from our recent celebrations: the entrances, light and florals we design, photographed on the day.",
+  /** Two rows on large screens: a wide picture and a narrower one, then the other way round. */
+  rows: [
+    [WORK.burgundyEntrance, WORK.chandelier],
+    [WORK.burgundyFlorals, WORK.roseWalkway],
+  ],
+} as const;
+
 export const ABOUT = {
   eyebrow: "About",
   headline: ["Planned with care.", "Celebrated with you."],

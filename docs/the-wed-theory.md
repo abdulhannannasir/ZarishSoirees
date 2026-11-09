@@ -95,8 +95,21 @@ npm test                     # unit tests for the enquiry rules, the message and
 
 ## Photos
 
-The portfolio photographs are the brand's concept images; the birthday, social-event and
+**The studio's own work** lives in `public/images/work/` and is described once, in `WORK` in
+`content.ts`. Two event photographs (the burgundy reception entrance and the chandelier) were cut
+into four pictures, cropped clear of the text printed on them and given a gentle finish (a little
+less saturation, a touch more contrast and warmth, light sharpening) so they sit with the site's
+palette. They open the portfolio ("Created by The Wed Theory"), lead its gallery without a label,
+and start the weddings gallery. The entrance signage shows the couple's names: ask them before
+naming them anywhere else.
+
+Three **design concepts** sit beside them, labelled "Concept image": the burgundy stage with the
+logo on its backdrop (also the arched photo on the weddings page), the pearl-and-candlelight mood
+board and the candlelit courtyard. When a concept is built and photographed, replace the file and set
+its `provenance` to `"studio"`.
+
+The other portfolio photographs are the brand's concept images; the birthday, social-event and
 corporate-event pages use stand-in stock photographs from Unsplash (credits in
-`docs/photo-credits.md`). The gallery says which is which in each caption. Replace them with the
-studio's own event photography when you have it (same file names, or new paths in `content.ts`,
-`services-content.ts` and `portfolio-gallery-data.ts`).
+`docs/photo-credits.md`). The gallery says which is which in each caption. To add more of the
+studio's photographs, put the file in `public/images/work/`, add an entry to `WORK` (with its pixel
+size) and, if it should open the portfolio, to `SIGNATURE.rows`.
