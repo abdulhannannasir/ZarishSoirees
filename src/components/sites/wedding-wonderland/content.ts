@@ -1,7 +1,7 @@
 /**
  * Everything the visitor reads or sees lives in this file: brand, hero copy, UI labels, the five
  * showpiece sections, the finale (founder profile, WhatsApp link and consultation form), their
- * photos and their moodboard pictures and palettes. To reskin or translate the site, edit this
+ * photos and their palettes. To reskin or translate the site, edit this
  * file only. No component needs to change.
  *
  * PHOTO RULES THAT APPLY TO EVERY SECTION
@@ -48,13 +48,6 @@ export type Photo = {
 
 export type Swatch = { name: string; value: string };
 
-/**
- * A picture on the moodboard. Any landscape or portrait photo under /public works; it is
- * cover-cropped, `focus` (CSS object-position) picks which part stays in frame. Tiles are small,
- * so a 1200 px wide file is plenty.
- */
-export type MoodPicture = Pick<Photo, "src" | "alt" | "focus">;
-
 export type Section = {
   /** URL hash that selects this section (/#grand-entrances). Lowercase, no spaces. */
   id: string;
@@ -64,12 +57,7 @@ export type Section = {
   /** Two or three short sentences. Keep it under ~150 characters so it reads in one glance. */
   body: string;
   photo: Photo;
-  /**
-   * Pictures shown in the moodboard panel while this section is open. Use three: the first is
-   * drawn wide (16:9), the other two as squares beneath it. Start with this section's own look.
-   */
-  moodboard: readonly MoodPicture[];
-  /** Palette shown in the moodboard panel while this section is open. */
+  /** The section's palette. `npm run placeholders` paints its placeholder photos in it. */
   swatches: readonly Swatch[];
   /** Changes the shape of the foreground blooms. Any whole number. */
   bloomSeed: number;
@@ -117,8 +105,8 @@ export const HERO = {
 export const UI = {
   scrollCta: "Scroll to explore",
   home: "Home",
-  moodboard: "Moodboard",
-  moodboardClose: "Close moodboard",
+  /** The header button (where the moodboard used to be) that opens the portfolio page. */
+  portfolio: { label: "Portfolio", href: "/portfolio" },
   sectionNavLabel: "Sections",
   soundOn: "Turn sound on",
   soundOff: "Mute sound",
@@ -126,45 +114,6 @@ export const UI = {
 
 /** Whether the original cut-out blooms float over each photo. Set to false for photos only. */
 export const FOREGROUND_BLOOMS = true;
-
-/**
- * The pictures the moodboards draw from, defined once so each scene below just picks three. They
- * reuse the section photos; to give a scene its own moodboard shots, add a picture here (or write
- * one inline in that scene's `moodboard`).
- */
-const MOOD = {
-  aisle: {
-    src: "/images/grand-entrance.jpg",
-    alt: "Candlelit aisle leading to an arch of white roses and baby's breath",
-    focus: "50% 50%",
-  },
-  stage: {
-    src: "/images/bespoke-stage.jpg",
-    alt: "Ceremony stage with an arch of white roses and floor-length ivory drapes",
-    focus: "50% 50%",
-  },
-  floral: {
-    src: "/images/floral-architecture.jpg",
-    alt: "Suspended installation of white roses, baby's breath and sage foliage above a candlelit table",
-    focus: "60% 35%",
-  },
-  table: {
-    src: "/images/custom-table.jpg",
-    alt: "Long candlelit table with ivory linen, tall tapers and white rose centrepieces",
-    focus: "60% 50%",
-  },
-  lights: {
-    src: "/images/lighting-ambience.jpg",
-    alt: "Reception hall with a crystal chandelier and a canopy of warm fairy lights",
-    focus: "50% 50%",
-  },
-  // 4:5 photo with the logo in its top third: the focus keeps the logo in a wide or square crop.
-  logo: {
-    src: "/images/finale-logo-table.jpg",
-    alt: `The ${BRAND.name} Events logo above a candlelit table of white roses and baby's breath`,
-    focus: "50% 14%",
-  },
-} satisfies Record<string, MoodPicture>;
 
 export const SECTIONS: readonly Section[] = [
   {
@@ -190,7 +139,6 @@ export const SECTIONS: readonly Section[] = [
       { name: "Baby’s Breath", value: "#fdfaf3" },
       { name: "Umber", value: "#2b2215" },
     ],
-    moodboard: [MOOD.aisle, MOOD.floral, MOOD.table],
     bloomSeed: 101,
   },
   {
@@ -201,12 +149,14 @@ export const SECTIONS: readonly Section[] = [
     photo: {
       // The stage fills the middle of a wide frame. Leave the top third relatively clear:
       // the header and the section dots sit there.
-      src: "/images/bespoke-stage.jpg",
-      // Portrait crop: the backdrop's centre piece, as tall as possible.
-      mobileSrc: "/images/bespoke-stage-mobile.jpg",
-      alt: "Ceremony stage with an arch of white roses and floor-length ivory drapes",
-      focus: "50% 45%",
-      brief: "Rose-covered arch against ivory silk drapes, architectural focal point, centred",
+      // The studio's burgundy stage (a design concept, with the brand's logo on the backdrop).
+      // Cropped so the logo sits in the upper part of the frame, clear of the copy.
+      src: "/images/scene-burgundy-stage.jpg",
+      // Portrait crop: the logo in the upper third, the sofa and roses below it.
+      mobileSrc: "/images/scene-burgundy-stage-mobile.jpg",
+      alt: "A white sofa on a stage between banks of pink and burgundy roses, under velvet swags, crystal strands and a gold chandelier, with The Wed Theory logo on the backdrop",
+      focus: "50% 50%",
+      brief: "Burgundy velvet stage with crystal strands, a gold chandelier and roses, logo on the backdrop",
     },
     swatches: [
       { name: "Silk", value: "#f1e9dc" },
@@ -216,7 +166,6 @@ export const SECTIONS: readonly Section[] = [
       { name: "Spotlight", value: "#f3dfb0" },
       { name: "Mahogany", value: "#4a3524" },
     ],
-    moodboard: [MOOD.stage, MOOD.aisle, MOOD.lights],
     bloomSeed: 202,
   },
   {
@@ -242,7 +191,6 @@ export const SECTIONS: readonly Section[] = [
       { name: "Cream", value: "#ecdfc6" },
       { name: "Candlelight", value: "#e6c58b" },
     ],
-    moodboard: [MOOD.floral, MOOD.stage, MOOD.table],
     bloomSeed: 303,
   },
   {
@@ -268,21 +216,24 @@ export const SECTIONS: readonly Section[] = [
       { name: "Sage", value: "#97a281" },
       { name: "Umber", value: "#2b2215" },
     ],
-    moodboard: [MOOD.table, MOOD.floral, MOOD.lights],
     bloomSeed: 404,
   },
   {
     id: "lighting-ambience",
     kicker: "The room, in a mood",
     title: "Lighting & Ambience",
-    body: "Crystal chandeliers and canopies of fairy lights shimmer overhead. Candelabras glow, silk catches the light, and the whole night turns to amber.",
+    body: "A gilded chandelier glows against deep burgundy velvet. Crystal catches the candlelight, and the whole room settles into a warm, golden hush.",
     photo: {
       // Dark, moody and wide. Light sources can be in the top half: the dark lower part keeps the
       // text readable without any extra darkening.
-      src: "/images/lighting-ambience.jpg",
-      alt: "Reception hall with a crystal chandelier and a canopy of warm fairy lights",
-      focus: "50% 35%",
-      brief: "Crystal chandelier, fairy-light canopy and candelabras over an ivory-draped reception hall",
+      // A photograph from one of the studio's own receptions, with the caption that was printed
+      // on it removed: a gilded crystal chandelier against burgundy velvet.
+      src: "/images/scene-chandelier.jpg",
+      // Portrait crop: the chandelier above, the velvet and florals below for the copy to sit on.
+      mobileSrc: "/images/scene-chandelier-mobile.jpg",
+      alt: "A gilded crystal chandelier glowing against burgundy velvet drapes, above deep red and marigold florals",
+      focus: "55% 45%",
+      brief: "Gilded crystal chandelier with candle bulbs against burgundy velvet drapes",
     },
     swatches: [
       { name: "Candlelight", value: "#e9c88f" },
@@ -292,7 +243,6 @@ export const SECTIONS: readonly Section[] = [
       { name: "Silk", value: "#efe6d6" },
       { name: "Umber", value: "#2b2215" },
     ],
-    moodboard: [MOOD.lights, MOOD.table, MOOD.aisle],
     bloomSeed: 505,
   },
 ];
@@ -313,7 +263,7 @@ export type ConsultationField = {
 export type Finale = {
   /** URL hash that selects the finale (/#meet-the-founder). Lowercase, no spaces. */
   id: string;
-  /** Used by the section dots, screen readers and the moodboard. Not drawn on the page itself. */
+  /** Used by the section dots and screen readers. Not drawn on the page itself. */
   title: string;
   /** Small line above the headline. */
   eyebrow: string;
@@ -365,9 +315,7 @@ export type Finale = {
       services: { label: string; options: readonly string[] };
     };
   };
-  /** Pictures shown in the moodboard panel while the finale is open. Use three, as in `Section`. */
-  moodboard: readonly MoodPicture[];
-  /** Palette shown in the moodboard panel while the finale is open. */
+  /** The finale's palette. `npm run placeholders` paints the portrait placeholder in it. */
   swatches: readonly Swatch[];
   /** Changes the shape of the foreground blooms. Any whole number. */
   bloomSeed: number;
@@ -461,15 +409,13 @@ export const FINALE: Finale = {
     { name: "Bronze", value: "#987558" },
     { name: "Candlelight", value: "#e9c88f" },
   ],
-  moodboard: [MOOD.logo, MOOD.lights, MOOD.floral],
   bloomSeed: 606,
 };
 
-/** What every scene (the five showpieces and the finale) offers to navigation and the moodboard. */
+/** What every scene (the five showpieces and the finale) offers to navigation. */
 export type SceneMeta = {
   id: string;
   title: string;
-  moodboard: readonly MoodPicture[];
   swatches: readonly Swatch[];
 };
 
