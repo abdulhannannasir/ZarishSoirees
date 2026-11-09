@@ -3,12 +3,13 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowDown, ChevronLeft, LayoutGrid, Sparkles, Volume2, VolumeX } from "lucide-react";
+import { ArrowDown, ArrowUpRight, ChevronLeft, LayoutGrid, Mail, Sparkles, Volume2, VolumeX } from "lucide-react";
+import { cn } from "@/lib/utils";
 import "./wonderland.css";
 import { Cluster, HangingVine } from "./art";
 import { ConsultationModal } from "./consultation-modal";
 import { BRAND, FINALE, HERO, SCENES, SECTIONS, UI, sceneIndexFromHash } from "./content";
-import { FinaleScene } from "./finale-scene";
+import { FinaleScene, InstagramIcon } from "./finale-scene";
 import { Photo } from "./photo";
 import { ShowpieceScene } from "./showpiece-scene";
 import { useAmbientSound } from "./use-ambient-sound";
@@ -20,8 +21,19 @@ type SceneState = "future" | "dim" | "active" | "past";
 /** Enter -> scene handoff, then scene -> settled (UI appears). Shortened under reduced motion. */
 const ENTER_MS = 3400;
 const SETTLE_MS = 5400;
-/** After a scene switch, input is ignored this long so one flick can't skip a scene. */
-const SWITCH_LOCK_MS = 2400;
+/**
+ * After a scene switch the wheel is ignored for at least this long, so one flick can't skip a
+ * scene. A trackpad keeps sending momentum for a while after the fingers lift: the lock lasts until
+ * the wheel has been quiet for WHEEL_QUIET_MS (but never longer than SWITCH_MAX_LOCK_MS), so a
+ * fresh gesture is answered at once and leftover momentum never tips the visitor on again.
+ */
+const SWITCH_MIN_LOCK_MS = 1300;
+const SWITCH_MAX_LOCK_MS = 2600;
+const WHEEL_QUIET_MS = 220;
+/** How quickly the scene follows the wheel: the time constant of the easing, in milliseconds. */
+const SCROLL_EASE_MS = 170;
+/** One wheel event moves at most this many pixels' worth, so a coarse mouse notch never jolts. */
+const WHEEL_STEP_MAX = 140;
 /** Pixels of wheel that traverse one scene's parallax. Tune this to change the scroll pace. */
 const WHEEL_RANGE = 900;
 /** How far past a scene's end (in progress units, ~160px of wheel) counts as "go to the next". */
@@ -72,6 +84,10 @@ const pill =
  */
 const iconOnlyOnPhones = "max-sm:size-11 max-sm:justify-center max-sm:px-0 max-sm:py-0";
 
+/** The round Contact and Instagram buttons in a phone's bottom-right corner, matching the sound button. */
+const phoneCorner =
+  "grid size-[47px] place-items-center rounded-full border border-[var(--wl-champagne)]/50 bg-[rgba(var(--wl-umber-rgb),0.88)] backdrop-blur-sm text-[var(--wl-champagne-light)] transition-colors hover:bg-[var(--wl-umber)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--wl-champagne)]";
+
 /** Today as YYYY-MM-DD in the visitor's own time zone: the consultation form's earliest date. */
 function todayIso(): string {
   const d = new Date();
@@ -107,6 +123,8 @@ export function Wonderland() {
   /** Scroll pushed past either end of a scene, accumulated until it is enough to switch. */
   const overshoot = useRef(0);
   const lockUntil = useRef(0);
+  /** When the last scene switch happened, to cap how long momentum can extend the lock. */
+  const switchedAt = useRef(0);
 
   const clearTimers = useCallback(() => {
     timers.current.forEach((id) => window.clearTimeout(id));
@@ -127,7 +145,8 @@ export function Wonderland() {
     (next: number, direction: "forward" | "back") => {
       if (next === currentRef.current || next < 0 || next > LAST) return;
       const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      lockUntil.current = performance.now() + (reduce ? 300 : SWITCH_LOCK_MS);
+      switchedAt.current = performance.now();
+      lockUntil.current = switchedAt.current + (reduce ? 300 : SWITCH_MIN_LOCK_MS);
       currentRef.current = next;
       overshoot.current = 0;
       // Arrive at the start when going forward, at the end when going back.
@@ -220,7 +239,17 @@ export function Wonderland() {
     };
 
     const onWheel = (e: WheelEvent) => {
-      if (!modalOpen) bump(e.deltaY / WHEEL_RANGE);
+      if (modalOpen) return;
+      const now = performance.now();
+      if (now < lockUntil.current) {
+        // Still moving from the gesture that switched scenes: hold the lock until it settles.
+        lockUntil.current = Math.min(switchedAt.current + SWITCH_MAX_LOCK_MS, Math.max(lockUntil.current, now + WHEEL_QUIET_MS));
+        return;
+      }
+      // Lines (Firefox) and pages become pixels, and one event never moves too far at once.
+      const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? window.innerHeight : 1;
+      const delta = Math.max(-WHEEL_STEP_MAX, Math.min(WHEEL_STEP_MAX, e.deltaY * unit));
+      bump(delta / WHEEL_RANGE);
     };
     // Touch: while the finger is down the scene follows it a little, then settles back. A flick,
     // or a drag of about an eighth of the screen, moves to the next scene (swipe up) or the
@@ -265,12 +294,22 @@ export function Wonderland() {
       else if (e.key === "Home") jump(0);
     };
 
-    const tick = () => {
+    // Time-based easing: the same glide on a 60 Hz and a 120 Hz screen, and nothing is written
+    // while the scene is at rest.
+    let last = 0;
+    let written = Number.NaN;
+    const tick = (now: number) => {
+      const dt = last ? Math.min(64, now - last) : 16;
+      last = now;
       const target = targetP.current;
       const eased = easedP.current;
-      const next = Math.abs(target - eased) < 0.0004 ? target : eased + (target - eased) * 0.08;
+      const follow = 1 - Math.exp(-dt / SCROLL_EASE_MS);
+      const next = Math.abs(target - eased) < 0.0004 ? target : eased + (target - eased) * follow;
       easedP.current = next;
-      setProgress(currentRef.current, next);
+      if (next !== written) {
+        setProgress(currentRef.current, next);
+        written = next;
+      }
       raf = window.requestAnimationFrame(tick);
     };
     raf = window.requestAnimationFrame(tick);
@@ -317,6 +356,61 @@ export function Wonderland() {
     return () => {
       window.removeEventListener("touchstart", onStart);
       window.removeEventListener("touchmove", onMove);
+    };
+  }, []);
+
+  // The mouse moves the room a little: photos drift against it, blooms and words with it, each by
+  // its own depth (see `--mx` / `--my` in wonderland.css). A real mouse only, never for reduced
+  // motion. The values are written to the layers themselves, not the root, so a frame touches a
+  // handful of elements instead of every bloom.
+  useEffect(() => {
+    const root = rootRef.current;
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (!root || !fine.matches || reduce.matches) return;
+    let layers: HTMLElement[] = [];
+    let targetX = 0;
+    let targetY = 0;
+    let x = 0;
+    let y = 0;
+    let raf = 0;
+    let last = 0;
+    const frame = (now: number) => {
+      raf = 0;
+      const dt = last ? Math.min(64, now - last) : 16;
+      last = now;
+      const follow = 1 - Math.exp(-dt / 280);
+      x += (targetX - x) * follow;
+      y += (targetY - y) * follow;
+      for (const layer of layers) {
+        layer.style.setProperty("--mx", x.toFixed(4));
+        layer.style.setProperty("--my", y.toFixed(4));
+      }
+      if (Math.abs(targetX - x) > 0.001 || Math.abs(targetY - y) > 0.001) raf = requestAnimationFrame(frame);
+      else last = 0;
+    };
+    const wake = () => {
+      if (raf) return;
+      layers = Array.from(root.querySelectorAll<HTMLElement>(".wl-pointer"));
+      raf = requestAnimationFrame(frame);
+    };
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      targetX = (e.clientX / window.innerWidth) * 2 - 1;
+      targetY = (e.clientY / window.innerHeight) * 2 - 1;
+      wake();
+    };
+    const onLeave = () => {
+      targetX = 0;
+      targetY = 0;
+      wake();
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    document.documentElement.addEventListener("mouseleave", onLeave);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("pointermove", onMove);
+      document.documentElement.removeEventListener("mouseleave", onLeave);
     };
   }, []);
 
@@ -384,7 +478,9 @@ export function Wonderland() {
 
       {/* Hero backdrop: sheer ivory drapes. It covers the first scene and dissolves on Enter. */}
       <div className="wl-hero-bg pointer-events-none absolute inset-0" aria-hidden="true">
-        <Photo photo={HERO.backdrop} priority />
+        <div className="wl-hero-photo wl-pointer absolute inset-0">
+          <Photo photo={HERO.backdrop} priority />
+        </div>
         <div className="wl-hero-wash absolute inset-0" />
       </div>
 
@@ -469,14 +565,37 @@ export function Wonderland() {
         <span className="wl-wordmark pointer-events-none absolute left-1/2 top-[clamp(18px,3.2vw,30px)] -translate-x-1/2 whitespace-nowrap font-label text-sm font-light tracking-[0.32em] [text-shadow:0_1px_14px_rgba(23,17,10,0.6)] max-sm:top-7 sm:text-base sm:tracking-[0.45em]">
           {BRAND.wordmark}
         </span>
-        <Link
-          href={UI.portfolio.href}
-          inert={stage !== 1}
-          className={`wl-ui ${pill} font-label text-sm ${iconOnlyOnPhones}`}
-        >
-          <LayoutGrid className="size-3.5 max-sm:size-4" aria-hidden="true" />
-          <span className="max-sm:sr-only">{UI.portfolio.label}</span>
-        </Link>
+        <div className="flex items-center gap-2.5">
+          <a
+            href={FINALE.instagram.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={UI.instagram.ariaLabel}
+            inert={stage !== 1}
+            className={cn("wl-ui", pill, "size-[42px] justify-center px-0 py-0 max-sm:hidden")}
+          >
+            <InstagramIcon className="size-[17px] shrink-0" />
+          </a>
+          <Link
+            href={UI.contact.href}
+            inert={stage !== 1}
+            className={`wl-ui ${pill} h-[42px] font-label text-sm max-sm:hidden`}
+          >
+            <Mail className="size-3.5" aria-hidden="true" />
+            {UI.contact.label}
+          </Link>
+          {/* The main way on: services first, then the portfolio. Gold, with a slow halo, so it is found. */}
+          <Link
+            href={UI.explore.href}
+            aria-label={UI.explore.ariaLabel}
+            inert={stage !== 1}
+            className="wl-ui wl-gold wl-halo inline-flex h-[42px] items-center gap-2 rounded-full px-5 font-label text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--wl-champagne)] max-sm:size-11 max-sm:justify-center max-sm:px-0"
+          >
+            <LayoutGrid className="size-4" aria-hidden="true" />
+            <span className="max-sm:sr-only">{UI.explore.label}</span>
+            <ArrowUpRight className="size-3.5 max-sm:hidden" aria-hidden="true" />
+          </Link>
+        </div>
       </header>
 
       {/* Scene dots: where you are, and a way to jump. */}
@@ -519,6 +638,22 @@ export function Wonderland() {
       >
         <SoundIcon className="size-[18px]" aria-hidden="true" />
       </button>
+
+      {/* Phones: Contact and Instagram live in the bottom-right corner, mirroring the sound button. */}
+      <div className="wl-ui absolute right-5 bottom-5 z-30 flex gap-2.5 sm:hidden" inert={stage !== 1}>
+        <Link href={UI.contact.href} aria-label={UI.contact.label} className={phoneCorner}>
+          <Mail className="size-[18px]" aria-hidden="true" />
+        </Link>
+        <a
+          href={FINALE.instagram.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={UI.instagram.ariaLabel}
+          className={phoneCorner}
+        >
+          <InstagramIcon className="size-[18px]" />
+        </a>
+      </div>
 
       {/* Consultation form: rendered here, outside the scenes, so their transforms can't clip it. */}
       <ConsultationModal open={consultOpen} onClose={closeConsultation} minDate={minDate} />

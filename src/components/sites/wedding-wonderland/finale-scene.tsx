@@ -5,7 +5,7 @@ import { FOREGROUND_BLOOMS, type Finale } from "./content";
 import { Photo } from "./photo";
 
 /** lucide-react has no brand icons, so the Instagram glyph is drawn here. */
-function InstagramIcon({ className }: { className?: string }) {
+export function InstagramIcon({ className }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -56,10 +56,10 @@ export function FinaleScene({
 
       {FOREGROUND_BLOOMS && (
         <div className="pointer-events-none absolute inset-0 hidden md:block" aria-hidden="true">
-          <div className="wl-fg absolute -left-[3%] top-[12%] aspect-square w-[clamp(110px,13vw,200px)]">
+          <div className="wl-fg wl-pointer absolute -left-[3%] top-[12%] aspect-square w-[clamp(110px,13vw,200px)]">
             <Cluster seed={finale.bloomSeed} blooms={2} />
           </div>
-          <div className="wl-fg wl-fg-deep absolute -bottom-[7%] -right-[4%] aspect-square w-[clamp(150px,20vw,290px)]">
+          <div className="wl-fg wl-fg-deep wl-pointer absolute -bottom-[7%] -right-[4%] aspect-square w-[clamp(150px,20vw,290px)]">
             <Cluster seed={finale.bloomSeed + 1} blooms={3} />
           </div>
         </div>
@@ -77,7 +77,7 @@ export function FinaleScene({
             aria-hidden="true"
           />
           <div className="absolute inset-0 overflow-hidden max-md:[mask-image:linear-gradient(to_bottom,#000_74%,transparent_100%)] md:rounded-t-full md:border md:border-[var(--wl-champagne)]/50 md:shadow-[0_30px_90px_-30px_rgba(207,174,114,0.4)]">
-            <div className="wl-portrait-photo absolute inset-0">
+            <div className="wl-portrait-photo wl-pointer absolute inset-0">
               <Photo photo={founder.portrait} sizes="(min-width: 768px) 34vw, 100vw" />
             </div>
             {/* Phones only: darkens the lower half so the copy and buttons stay readable. */}
@@ -86,7 +86,7 @@ export function FinaleScene({
         </div>
 
         {/* COPY: bottom of the screen on phones (above the sound button), beside the arch on desktop. */}
-        <div className="wl-copy absolute inset-x-0 bottom-0 pb-[84px] pl-[clamp(20px,5vw,72px)] pr-[clamp(44px,12vw,72px)] [text-shadow:0_2px_24px_rgba(23,17,10,0.6)] md:static md:inset-auto md:min-w-0 md:max-w-[34rem] md:flex-1 md:p-0">
+        <div className="wl-copy wl-pointer absolute inset-x-0 bottom-0 pb-[84px] pl-[clamp(20px,5vw,72px)] pr-[clamp(44px,12vw,72px)] [text-shadow:0_2px_24px_rgba(23,17,10,0.6)] md:static md:inset-auto md:min-w-0 md:max-w-[34rem] md:flex-1 md:p-0">
           <p
             className="font-label text-[12px] font-normal uppercase tracking-[0.24em] text-[var(--wl-champagne-light)]"
             style={step(0)}

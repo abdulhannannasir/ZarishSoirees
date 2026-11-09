@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { BRAND } from "@/components/sites/twt/content";
 import { LocalBusinessSchema } from "@/components/sites/twt/local-business-schema";
 import { Wonderland } from "@/components/sites/wedding-wonderland/wonderland";
+import { PointerEffects } from "@/components/ui/pointer-effects";
 
 // The front page keeps its own full title; this adds its canonical link.
 export const metadata: Metadata = {
@@ -18,6 +19,7 @@ export default function Home() {
     <>
       <LocalBusinessSchema />
       <Wonderland />
+      <PointerEffects />
     </>
   );
 }

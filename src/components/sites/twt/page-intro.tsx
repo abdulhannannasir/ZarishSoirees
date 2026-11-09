@@ -24,12 +24,17 @@ export function PageIntro({ eyebrow, headline, intro, children }: PageIntroProps
         <p className="text-[13px] leading-none font-medium tracking-[0.28em] text-ink-soft uppercase motion-safe:animate-rise">
           {eyebrow}
         </p>
+        {/* Each line rises from behind its own mask ("Line reveal" in globals.css). */}
         <h1
           id="page-heading"
-          className="mt-3.5 text-[clamp(2.25rem,4.3vw,4.5rem)] leading-[1.04] font-normal text-ink motion-safe:animate-rise motion-safe:[animation-delay:120ms]"
+          className="mt-3.5 text-[clamp(2.25rem,4.3vw,4.5rem)] leading-[1.04] font-normal text-ink"
         >
-          <span className="block">{headline[0]}</span>
-          <span className="block text-[1.035em] tracking-[0.015em] italic">{headline[1]}</span>
+          <span className="line-mask">
+            <span className="line-rise [--line-delay:120ms]">{headline[0]}</span>
+          </span>
+          <span className="line-mask text-[1.035em] tracking-[0.015em] italic">
+            <span className="line-rise [--line-delay:260ms]">{headline[1]}</span>
+          </span>
         </h1>
         <p className="mt-6 max-w-[34rem] text-[17px] leading-[1.4] text-ink motion-safe:animate-rise motion-safe:[animation-delay:240ms]">
           {intro}

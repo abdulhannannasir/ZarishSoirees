@@ -26,16 +26,19 @@ export function PortfolioGrid() {
             <li key={item.id} className={cn("group", span)}>
               <figure>
                 <div className="relative aspect-[4/5] overflow-hidden bg-cream sm:aspect-[4/3] lg:aspect-auto lg:h-[clamp(22rem,33vw,36rem)]">
-                  <Image
-                    src={item.photo.src}
-                    alt={item.photo.alt}
-                    fill
-                    sizes={sizes}
-                    // The first tile is in view on a laptop screen, so it is the page's LCP image.
-                    loading={index === 0 ? "eager" : undefined}
-                    style={{ objectPosition: item.photo.focus }}
-                    className="object-cover transition-transform duration-[1400ms] ease-out motion-safe:group-hover:scale-[1.04]"
-                  />
+                  {/* The photo drifts against the scroll (data-parallax, see scroll-motion.tsx). */}
+                  <div data-parallax="0.07" className="absolute inset-0">
+                    <Image
+                      src={item.photo.src}
+                      alt={item.photo.alt}
+                      fill
+                      sizes={sizes}
+                      // The first tile is in view on a laptop screen, so it is the page's LCP image.
+                      loading={index === 0 ? "eager" : undefined}
+                      style={{ objectPosition: item.photo.focus }}
+                      className="object-cover transition-transform duration-[1400ms] ease-out motion-safe:group-hover:scale-[1.04]"
+                    />
+                  </div>
                 </div>
                 <figcaption className="mt-5 grid grid-cols-[auto_1fr] gap-x-5">
                   <span

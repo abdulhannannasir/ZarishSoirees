@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ContactSection } from "@/components/sites/twt/contact-section";
-import { CONTACT } from "@/components/sites/twt/content";
+import { ArchShowcase } from "@/components/sites/twt/arch-showcase";
+import { CONTACT, INTRO_SHOWCASE } from "@/components/sites/twt/content";
 import { PageIntro } from "@/components/sites/twt/page-intro";
 import { pageMetadata } from "@/lib/metadata";
 
@@ -14,7 +15,9 @@ export const metadata: Metadata = pageMetadata({
 export default function ContactPage() {
   return (
     <>
-      <PageIntro eyebrow={CONTACT.eyebrow} headline={CONTACT.headline} intro={CONTACT.intro} />
+      <PageIntro eyebrow={CONTACT.eyebrow} headline={CONTACT.headline} intro={CONTACT.intro}>
+        <ArchShowcase slides={INTRO_SHOWCASE.contact} />
+      </PageIntro>
       <ContactSection />
     </>
   );
