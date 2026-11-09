@@ -4,7 +4,43 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* A device with a real mouse: hover effects belong here, and captions that hide on hover must not hide on touch. */
+@custom-variant can-hover (@media (hover: hover) and (pointer: fine));
+
+/* A phone held sideways: wide enough for the desktop layout, but very short. */
+@custom-variant short (@media (max-height: 520px) and (orientation: landscape));
+
+/*
+ * Grows an element's touch area to at least 44px tall (the size fingers need) without changing how
+ * it looks or lays out: an invisible layer covers the extra space. Does nothing to taller elements.
+ */
+@utility tap-target {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    inset-block: min(0px, calc((100% - 44px) / 2));
+  }
+}
+
 @theme inline {
+  /* Brand palette, sampled from the approved front design. */
+  --color-ivory: var(--ivory);
+  --color-cream: var(--cream);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-forest: var(--forest);
+  --color-line: var(--line);
+  --color-clay: var(--clay);
+  /* Cinematic palette: a deep charcoal for the dark scenes, champagne for light on dark, soft florals. */
+  --color-charcoal: var(--charcoal);
+  --color-champagne: var(--champagne);
+  --color-champagne-light: var(--champagne-light);
+  --color-gold: var(--gold);
+  --color-blush: var(--blush);
+  --color-ice: var(--ice);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
@@ -13,6 +49,10 @@
   --font-display: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
   --font-label: var(--font-jost), "Jost", ui-sans-serif, system-ui, sans-serif;
   --font-script: var(--font-mrs-saint), "Mrs Saint Delafield", "Snell Roundhand", cursive;
+  /* The inner pages (twt): Cormorant is the voice of every headline and paragraph, Jost is for
+     navigation, buttons, small labels, descriptions and the enquiry form. */
+  --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-ui: var(--font-jost), "Jost", ui-sans-serif, system-ui, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,41 +89,91 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  --animate-rise: rise 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-fade: fade 1200ms ease-out both;
+  --animate-settle: settle 1800ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-pop: pop 800ms cubic-bezier(0.22, 1, 0.36, 1) 900ms both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* The floating button arriving: it grows from small and lifts into place. */
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translateY(14px) scale(0.6);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* A photo easing into its frame: it starts a touch large and soft, then settles. */
+  @keyframes settle {
+    from {
+      opacity: 0;
+      transform: scale(1.1);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --ivory: #f0ede2;
+  --cream: #f1e9dc;
+  --ink: #35342a;
+  --ink-soft: #6b675b;
+  --forest: #2f3b2b;
+  --line: #ddd8cc;
+  --clay: #8f3b2c;
+  --charcoal: #15130f;
+  --champagne: #d8c39a;
+  --champagne-light: #ece0c6;
+  --gold: #b49a62;
+  --blush: #e8c7bf;
+  --ice: #bcd3ea;
+
+  --background: var(--ivory);
+  --foreground: var(--ink);
+  --card: var(--ivory);
+  --card-foreground: var(--ink);
+  --popover: var(--ivory);
+  --popover-foreground: var(--ink);
+  --primary: var(--forest);
+  --primary-foreground: var(--cream);
+  --secondary: var(--cream);
+  --secondary-foreground: var(--ink);
+  --muted: var(--cream);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--cream);
+  --accent-foreground: var(--ink);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--forest);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
 }
 
 .dark {
@@ -129,5 +219,96 @@
   }
   html {
     @apply font-sans;
+  }
+  /* The inner pages (services, portfolio, about, contact, the quiz). The showcase on the front page
+     sets its own type and colours, so these apply only where a .twt-page frame is on screen. Set on
+     the body so menus and viewers that open outside the frame (portals) match too. */
+  body:has(.twt-page) {
+    font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+    font-weight: 500;
+    text-rendering: optimizeLegibility;
+    /* The flash a phone shows on a tap: a soft forest tint instead of the default grey. */
+    -webkit-tap-highlight-color: rgb(47 59 43 / 0.12);
+  }
+  html:has(.twt-page) {
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html:has(.twt-page) {
+      scroll-behavior: auto;
+    }
+  }
+  /* The full-screen picture viewer is modal: the page behind it must not scroll. */
+  body:has(dialog[open]) {
+    overflow: hidden;
+  }
+}
+
+/*
+ * The cursor ring (pointer-effects.tsx), for a real mouse only. It blends with whatever is beneath
+ * it (white on dark, dark on light), ignores clicks and never replaces the normal cursor.
+ */
+.twt-cursor {
+  position: fixed;
+  top: -18px;
+  left: -18px;
+  z-index: 90;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #fff;
+  border-radius: 999px;
+  mix-blend-mode: difference;
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 0.3s ease,
+    width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    margin 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.3s ease;
+}
+.twt-cursor[data-visible] {
+  opacity: 0.85;
+}
+.twt-cursor[data-active] {
+  width: 56px;
+  height: 56px;
+  margin: -10px 0 0 -10px;
+  background-color: rgb(255 255 255 / 0.14);
+}
+.twt-cursor[data-pressed] {
+  width: 28px;
+  height: 28px;
+  margin: 4px 0 0 4px;
+}
+@media print, (prefers-reduced-motion: reduce) {
+  .twt-cursor {
+    display: none;
+  }
+}
+
+/*
+ * Scroll reveal: a block with data-reveal rises into place when it scrolls into view (the Reveal
+ * component marks it data-revealed). It is only hidden when scripts run and motion is welcome, so
+ * with JavaScript off or reduced motion on, everything simply shows. If the script never arrives
+ * (blocked, or a slow connection), the failsafe shows the block after a few seconds anyway.
+ */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  [data-reveal]:not([data-revealed]) {
+    opacity: 0;
+    transform: translateY(26px);
+    animation: reveal-failsafe 1ms 5s forwards;
+  }
+  [data-reveal] {
+    transition:
+      opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
+      transform 1000ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+  }
+}
+
+@keyframes reveal-failsafe {
+  to {
+    opacity: 1;
+    transform: none;
   }
 }

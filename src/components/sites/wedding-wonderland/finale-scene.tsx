@@ -1,8 +1,13 @@
 import type { CSSProperties } from "react";
+import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import { Cluster } from "./art";
-import { FOREGROUND_BLOOMS, type Finale } from "./content";
+import { FOREGROUND_BLOOMS, SITE_PAGES, type Finale } from "./content";
 import { Photo } from "./photo";
+
+/** The finale's quiet links to the enquiry form and the inner pages. */
+const pageLink =
+  "inline-flex items-center font-label text-[0.9rem] font-light tracking-[0.04em] text-[var(--wl-ivory)]/75 underline-offset-4 transition-colors hover:text-[var(--wl-champagne-light)] hover:underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--wl-ivory)]";
 
 /** lucide-react has no brand icons, so the Instagram glyph is drawn here. */
 function InstagramIcon({ className }: { className?: string }) {
@@ -146,18 +151,27 @@ export function FinaleScene({
             </button>
           </div>
 
-          <a
-            href={instagram.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={step(5)}
-            className="mt-4 inline-flex items-center gap-2 font-label text-[0.9rem] font-light tracking-[0.04em] text-[var(--wl-ivory)]/75 transition-colors hover:text-[var(--wl-champagne-light)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--wl-ivory)]"
-          >
-            <InstagramIcon className="size-[1.05rem]" />
-            <span className="sr-only">{instagram.label} </span>
-            {instagram.handle}
-            <span className="sr-only"> {instagram.newTabNote}</span>
-          </a>
+          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2" style={step(5)}>
+            <a
+              href={instagram.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 font-label text-[0.9rem] font-light tracking-[0.04em] text-[var(--wl-ivory)]/75 transition-colors hover:text-[var(--wl-champagne-light)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--wl-ivory)]"
+            >
+              <InstagramIcon className="size-[1.05rem]" />
+              <span className="sr-only">{instagram.label} </span>
+              {instagram.handle}
+              <span className="sr-only"> {instagram.newTabNote}</span>
+            </a>
+            <Link href={SITE_PAGES.enquiry.href} className={pageLink}>
+              {SITE_PAGES.enquiry.label}
+            </Link>
+            {SITE_PAGES.links.slice(0, 2).map((link) => (
+              <Link key={link.href} href={link.href} className={`${pageLink} max-sm:hidden`}>
+                {link.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </>

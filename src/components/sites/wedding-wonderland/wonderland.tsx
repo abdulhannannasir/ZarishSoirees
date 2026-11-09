@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowDown, ChevronLeft, LayoutGrid, Sparkles, Volume2, VolumeX, X } from "lucide-react";
 import "./wonderland.css";
 import { Cluster, HangingVine } from "./art";
 import { ConsultationModal } from "./consultation-modal";
-import { BRAND, FINALE, HERO, SCENES, SECTIONS, UI, sceneIndexFromHash } from "./content";
+import { BRAND, FINALE, HERO, SCENES, SECTIONS, SITE_PAGES, UI, sceneIndexFromHash } from "./content";
 import { FinaleScene } from "./finale-scene";
 import { Photo } from "./photo";
 import { ShowpieceScene } from "./showpiece-scene";
@@ -459,6 +460,21 @@ export function Wonderland() {
           <Sparkles className="size-3 text-[var(--wl-sage-deep)]" aria-hidden="true" />
           {HERO.greeting}
         </p>
+        <nav
+          aria-label={SITE_PAGES.label}
+          className="wl-intro-item wl-fade mt-5 flex flex-wrap items-center justify-center gap-x-1 font-label text-[11px] uppercase tracking-[0.18em] sm:gap-x-3"
+          style={{ "--d": "1.5s" } as CSSProperties}
+        >
+          {SITE_PAGES.links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="inline-flex min-h-11 items-center border-b border-transparent px-2 transition-colors hover:border-[var(--wl-ink)]/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--wl-ink)]"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </nav>
       </section>
 
       <p aria-live="polite" className="sr-only">

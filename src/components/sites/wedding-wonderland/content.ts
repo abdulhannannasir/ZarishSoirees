@@ -124,6 +124,22 @@ export const UI = {
   soundOff: "Mute sound",
 } as const;
 
+/**
+ * Links from the showcase to the rest of the site: the inner pages (services, portfolio, about and
+ * the contact page with the enquiry form). Shown under the Enter button and at the end of the finale.
+ */
+export const SITE_PAGES = {
+  label: "Explore the site",
+  links: [
+    { label: "Services", href: "/services" },
+    { label: "Portfolio", href: "/portfolio" },
+    { label: "About", href: "/about" },
+    { label: "Contact", href: "/contact" },
+  ],
+  /** The finale's link to the enquiry form on the contact page. */
+  enquiry: { label: "Send an enquiry", href: "/contact#enquire" },
+} as const;
+
 /** Whether the original cut-out blooms float over each photo. Set to false for photos only. */
 export const FOREGROUND_BLOOMS = true;
 
