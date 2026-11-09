@@ -13,7 +13,7 @@ interaction. Fonts are open stand-ins (Cormorant Garamond, Jost), not the source
 
 | Want to change | Edit |
 | --- | --- |
-| Any text, image path, alt text, palette, moodboard pictures (`MOOD` and each scene's `moodboard`), hash id, WhatsApp link, founder bio, form fields | `src/components/sites/wedding-wonderland/content.ts` |
+| Any text, image path, alt text, palette, the header's Portfolio button (`UI.portfolio`), hash id, WhatsApp link, founder bio, form fields | `src/components/sites/wedding-wonderland/content.ts` |
 | Placeholder images | `npm run placeholders` (reads `content.ts`; skips files that already exist, `-- --force` overwrites them), or drop real files in `public/` |
 | Scene logic, scrolling, sound, header | `wonderland.tsx` |
 | Section layout (photo, scrim, copy block) | `showpiece-scene.tsx` |
@@ -98,7 +98,8 @@ instead of snapping back to zero.
   `{ passive: false }`: iOS makes window-level touch listeners passive, which ignores
   `preventDefault`. Pinch zoom, and panning while zoomed in, are left alone. Anything that has to
   scroll natively (the consultation form) carries `data-touch-scroll`.
-- While the consultation form or the moodboard is open, wheel, swipes and keys do nothing behind it.
+- While the consultation form is open, wheel, swipes and keys do nothing behind it.
+- The header's right-hand button (once the moodboard) opens the portfolio page (`/portfolio`).
 
 ## Consultation form (finale)
 

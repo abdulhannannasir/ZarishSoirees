@@ -3,11 +3,11 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowDown, ChevronLeft, LayoutGrid, Sparkles, Volume2, VolumeX, X } from "lucide-react";
+import { ArrowDown, ChevronLeft, LayoutGrid, Sparkles, Volume2, VolumeX } from "lucide-react";
 import "./wonderland.css";
 import { Cluster, HangingVine } from "./art";
 import { ConsultationModal } from "./consultation-modal";
-import { BRAND, FINALE, HERO, SCENES, SECTIONS, SITE_PAGES, UI, sceneIndexFromHash } from "./content";
+import { BRAND, FINALE, HERO, SCENES, SECTIONS, UI, sceneIndexFromHash } from "./content";
 import { FinaleScene } from "./finale-scene";
 import { Photo } from "./photo";
 import { ShowpieceScene } from "./showpiece-scene";
@@ -83,12 +83,11 @@ export function Wonderland() {
   const [phase, setPhase] = useState<Phase>("intro");
   const [stage, setStage] = useState<0 | 1>(0);
   const [current, setCurrent] = useState(0);
-  const [boardOpen, setBoardOpen] = useState(false);
   const [consultOpen, setConsultOpen] = useState(false);
   const [minDate, setMinDate] = useState("");
 
-  /** While any dialog is open, the page must not scroll or react to keys behind it. */
-  const modalOpen = boardOpen || consultOpen;
+  /** While the consultation form is open, the page must not scroll or react to keys behind it. */
+  const modalOpen = consultOpen;
 
   const sound = useAmbientSound();
 
@@ -165,7 +164,6 @@ export function Wonderland() {
     overshoot.current = 0;
     lockUntil.current = 0;
     SCENES.forEach((_, i) => setProgress(i, 0));
-    setBoardOpen(false);
     setConsultOpen(false);
     setCurrent(0);
     setStage(0);
@@ -334,15 +332,6 @@ export function Wonderland() {
     return () => window.removeEventListener("hashchange", onHashChange);
   }, [stage, goToSection]);
 
-  useEffect(() => {
-    if (!boardOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setBoardOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [boardOpen]);
-
   const SoundIcon = sound.enabled ? Volume2 : VolumeX;
   /** The finale has its own buttons, so the scroll hint has nothing left to point at. */
   const hintHidden = current === LAST;
@@ -460,21 +449,6 @@ export function Wonderland() {
           <Sparkles className="size-3 text-[var(--wl-sage-deep)]" aria-hidden="true" />
           {HERO.greeting}
         </p>
-        <nav
-          aria-label={SITE_PAGES.label}
-          className="wl-intro-item wl-fade mt-5 flex flex-wrap items-center justify-center gap-x-1 font-label text-[11px] uppercase tracking-[0.18em] sm:gap-x-3"
-          style={{ "--d": "1.5s" } as CSSProperties}
-        >
-          {SITE_PAGES.links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="inline-flex min-h-11 items-center border-b border-transparent px-2 transition-colors hover:border-[var(--wl-ink)]/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--wl-ink)]"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
       </section>
 
       <p aria-live="polite" className="sr-only">
@@ -495,15 +469,14 @@ export function Wonderland() {
         <span className="wl-wordmark pointer-events-none absolute left-1/2 top-[clamp(18px,3.2vw,30px)] -translate-x-1/2 whitespace-nowrap font-label text-sm font-light tracking-[0.32em] [text-shadow:0_1px_14px_rgba(23,17,10,0.6)] max-sm:top-7 sm:text-base sm:tracking-[0.45em]">
           {BRAND.wordmark}
         </span>
-        <button
-          type="button"
-          onClick={() => setBoardOpen(true)}
+        <Link
+          href={UI.portfolio.href}
           inert={stage !== 1}
           className={`wl-ui ${pill} font-label text-sm ${iconOnlyOnPhones}`}
         >
           <LayoutGrid className="size-3.5 max-sm:size-4" aria-hidden="true" />
-          <span className="max-sm:sr-only">{UI.moodboard}</span>
-        </button>
+          <span className="max-sm:sr-only">{UI.portfolio.label}</span>
+        </Link>
       </header>
 
       {/* Scene dots: where you are, and a way to jump. */}
@@ -546,73 +519,6 @@ export function Wonderland() {
       >
         <SoundIcon className="size-[18px]" aria-hidden="true" />
       </button>
-
-      {/* Moodboard: the current scene's pictures and palette. The overlay scrolls (and keeps native
-          touch scrolling, see `data-touch-scroll`) because the panel can be taller than a phone. */}
-      {boardOpen && (
-        <div
-          data-touch-scroll
-          className="absolute inset-0 z-40 overflow-y-auto bg-[rgba(var(--wl-umber-rgb),0.74)] backdrop-blur-sm"
-        >
-          <div
-            className="flex min-h-full items-center justify-center p-4 sm:p-6"
-            onClick={(e) => {
-              if (e.target === e.currentTarget) setBoardOpen(false);
-            }}
-          >
-            <div
-              role="dialog"
-              aria-modal="true"
-              aria-label={UI.moodboard}
-              className="w-full max-w-lg rounded-2xl border border-[var(--wl-ivory)]/15 bg-[var(--wl-umber)] p-5 sm:p-6"
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <h3 className="font-display text-2xl font-medium">{UI.moodboard}</h3>
-                <button
-                  type="button"
-                  autoFocus
-                  onClick={() => setBoardOpen(false)}
-                  aria-label={UI.moodboardClose}
-                  className="grid size-8 place-items-center rounded-full hover:bg-[var(--wl-ivory)]/10 focus-visible:outline-2 focus-visible:outline-[var(--wl-ivory)]"
-                >
-                  <X className="size-4" aria-hidden="true" />
-                </button>
-              </div>
-              <p className="mb-3 font-label text-xs uppercase tracking-[0.14em] text-[var(--wl-ivory)]/50">
-                {SCENES[current].title}
-              </p>
-              {/* The first picture is wide, the rest are squares beneath it. */}
-              <ul className="mb-5 grid grid-cols-2 gap-2">
-                {SCENES[current].moodboard.map((picture, i) => (
-                  <li
-                    key={picture.src}
-                    className={`relative overflow-hidden rounded-xl bg-[var(--wl-ivory)]/10 ${
-                      i === 0 ? "col-span-2 aspect-video" : "aspect-square"
-                    }`}
-                  >
-                    <Photo
-                      photo={picture}
-                      sizes={i === 0 ? "(max-width: 540px) 90vw, 480px" : "(max-width: 540px) 45vw, 240px"}
-                    />
-                  </li>
-                ))}
-              </ul>
-              <ul className="grid grid-cols-3 gap-4 font-label text-xs">
-                {SCENES[current].swatches.map((s) => (
-                  <li key={`${s.name}-${s.value}`} className="flex flex-col gap-2">
-                    <span
-                      className="block aspect-square rounded-full border border-[var(--wl-ivory)]/20"
-                      style={{ backgroundColor: s.value }}
-                    />
-                    <span>{s.name}</span>
-                    <span className="uppercase text-[var(--wl-ivory)]/50">{s.value}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Consultation form: rendered here, outside the scenes, so their transforms can't clip it. */}
       <ConsultationModal open={consultOpen} onClose={closeConsultation} minDate={minDate} />
