@@ -354,6 +354,82 @@
   }
 }
 
+/* Page arrival (app/(pages)/template.tsx): each inner page fades and rises in on navigation. */
+@media (prefers-reduced-motion: no-preference) {
+  .page-arrive {
+    animation: page-arrive 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+@keyframes page-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/*
+ * Line reveal (page-intro.tsx): a headline line rises from behind a mask. The mask is padded and
+ * pulled back by the same amount, so descenders and italic overhangs are never clipped.
+ */
+.line-mask {
+  display: block;
+  overflow: hidden;
+  padding: 0 0.12em 0.16em 0;
+  margin: 0 -0.12em -0.16em 0;
+}
+.line-rise {
+  display: block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .line-rise {
+    animation: line-rise 1100ms cubic-bezier(0.22, 1, 0.36, 1) var(--line-delay, 0ms) both;
+  }
+}
+@keyframes line-rise {
+  from {
+    transform: translateY(108%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* The reading-progress hairline along the top of an inner page (scroll-motion.tsx scales it). */
+.scroll-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  height: 2px;
+  background: linear-gradient(90deg, var(--gold), var(--champagne));
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  pointer-events: none;
+}
+@media print {
+  .scroll-progress {
+    display: none;
+  }
+}
+
+/* The services band above the footer (services-marquee.tsx): one slow loop, paused under the mouse. */
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-track {
+    animation: marquee 48s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 /* The arch showcase (arch-showcase.tsx): the photo on show drifts slowly in, like a held breath. */
 @media (prefers-reduced-motion: no-preference) {
   .arch-slide[data-active] img {

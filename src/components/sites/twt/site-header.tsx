@@ -24,33 +24,52 @@ const pill =
  * Sits over the top of the hero: navigation on the left, the logo in the middle, Contact and the
  * Enquire pill on the right. Below `lg` the links move into a full-screen menu.
  *
- * On inner pages it scrolls away with the page. On the front page, whose scrolling journey is many
- * screens long, it stays put (fixed) so the menu and the Enquire button are always within reach: it
- * starts transparent over the hero's drapes, then settles into a slim ivory bar after the first scroll.
+ * It stays within reach on every inner page: transparent over the top of the page, a slim ivory bar
+ * once the page has scrolled, tucked away while the visitor reads down and back as soon as they
+ * scroll up. (The front page is the immersive showcase and has its own header.)
  */
 export function SiteHeader() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-  const isHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
+  /** The page the header was tucked away on, so a newly opened page always starts with it in view. */
+  const [tuckedOn, setTuckedOn] = useState<string | null>(null);
 
+  // The header follows the page: transparent at the very top, a slim ivory bar once the page has
+  // scrolled, tucked away while reading down, and back the moment the visitor scrolls up.
   useEffect(() => {
-    if (!isHome) return;
-    const update = () => setScrolled(window.scrollY > 24);
+    let lastY = window.scrollY;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const y = window.scrollY;
+      setScrolled(y > 24);
+      if (y < 160) setTuckedOn(null);
+      else if (y > lastY + 6) setTuckedOn(window.location.pathname);
+      else if (y < lastY - 6) setTuckedOn(null);
+      if (Math.abs(y - lastY) > 6) lastY = y;
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
     update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, [isHome]);
-  // A page other than the front page never has the slim bar, even if the state is left over.
-  const slim = isHome && scrolled;
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+  const slim = scrolled;
+  const hidden = tuckedOn === pathname && !menuOpen;
 
   return (
     <header
       data-scrolled={slim ? "true" : undefined}
+      data-hidden={hidden ? "true" : undefined}
       className={cn(
-        "group/header intro-hide inset-x-0 top-0 z-30 transition-[background-color,box-shadow] duration-500",
-        isHome ? "fixed" : "absolute",
-        "data-[scrolled=true]:bg-ivory data-[scrolled=true]:shadow-[0_1px_0_rgba(53,52,42,0.14)]",
+        "group/header fixed inset-x-0 top-0 z-30 transition-[background-color,box-shadow,transform] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        "data-[scrolled=true]:bg-ivory/95 data-[scrolled=true]:shadow-[0_1px_0_rgba(53,52,42,0.14)] data-[scrolled=true]:backdrop-blur-md",
+        "data-[hidden=true]:-translate-y-full motion-reduce:transition-none",
       )}
     >
       <div className="grid grid-cols-[1fr_auto_1fr] items-center px-5 pt-4 transition-[padding] duration-500 sm:px-8 lg:items-start lg:pt-[26px] lg:pr-[4.14vw] lg:pl-[6.56vw] group-data-[scrolled=true]/header:pt-2 group-data-[scrolled=true]/header:pb-2 lg:group-data-[scrolled=true]/header:min-h-[72px] lg:group-data-[scrolled=true]/header:items-center lg:group-data-[scrolled=true]/header:py-0">

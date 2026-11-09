@@ -38,6 +38,13 @@ All of it switches off for visitors who prefer reduced motion, and none of it is
 - **Inner pages.** Smooth, inertial scrolling for the wheel and trackpad (Lenis, in
   `src/components/ui/scroll-motion.tsx`; touch keeps native scrolling), and photos marked
   `data-parallax` drift against the scroll.
+- **Header.** On the inner pages it stays within reach: transparent at the top, a slim ivory bar
+  once the page scrolls, tucked away while reading down and back on the way up (`site-header.tsx`).
+- **Page arrival and headlines.** Each inner page fades and rises in on navigation
+  (`app/(pages)/template.tsx`), and its title rises line by line from behind a mask
+  (`page-intro.tsx`). A champagne hairline along the top shows how far down the page you are.
+- **Services band.** Above the footer, the four services drift slowly across the page
+  (`services-marquee.tsx`); it pauses under the mouse.
 - **Cursor.** A ring trails a real mouse everywhere; over anything marked `data-cursor="View"` (or
   "Explore") it becomes a champagne disc with that word (`pointer-effects.tsx`).
 - **The arch beside a page title** (`arch-showcase.tsx`): photographs cross-fade and drift in the

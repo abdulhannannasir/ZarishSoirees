@@ -12,6 +12,8 @@ const KEEP_NATIVE = "dialog, [role='dialog'], [data-lenis-prevent]";
  *
  * - smooth, inertial scrolling for the mouse wheel and trackpad (Lenis). Touch screens keep their
  *   own native scrolling, which is already smooth;
+ * - a reading-progress hairline: the element marked `data-scroll-progress` is scaled across the
+ *   top of the screen as the visitor moves down the page;
  * - parallax: any element marked `data-parallax` (a layer inside a photo frame that clips it)
  *   drifts a little against the scroll, so photos seem to sit behind the page. The value is the
  *   share of the frame's height it travels, 0.08 by default.
@@ -62,6 +64,12 @@ export function ScrollMotion() {
     let raf = 0;
     const update = () => {
       raf = 0;
+      const bar = document.querySelector<HTMLElement>("[data-scroll-progress]");
+      if (bar) {
+        const room = document.documentElement.scrollHeight - window.innerHeight;
+        const done = room > 0 ? Math.min(1, Math.max(0, window.scrollY / room)) : 0;
+        bar.style.transform = `scaleX(${done.toFixed(4)})`;
+      }
       const half = window.innerHeight / 2;
       for (const element of visible) {
         const frame = (element.parentElement ?? element).getBoundingClientRect();
@@ -77,6 +85,7 @@ export function ScrollMotion() {
     }
 
     watch();
+    schedule();
     // Pictures that arrive later (a filtered gallery, a section that loads after the page) join in.
     const mutations = new MutationObserver(watch);
     mutations.observe(document.body, { childList: true, subtree: true });
