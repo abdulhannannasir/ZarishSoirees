@@ -103,6 +103,14 @@ palette. They open the portfolio ("Created by The Wed Theory"), lead its gallery
 and start the weddings gallery. The entrance signage shows the couple's names: ask them before
 naming them anywhere else.
 
+**On the front page**, the showcase's Lighting & Ambience scene uses the chandelier photograph (the
+printed caption was removed by filling it with the surrounding velvet, so the whole height can be
+used on phones), and the Bespoke Stage & Backdrop scene uses the burgundy stage, cropped so its logo
+sits above the scene's words. Their files are `public/images/scene-*.jpg` (a wide one for desktops
+and a `-mobile` portrait one for phones), and the paths are in
+`src/components/sites/wedding-wonderland/content.ts`. Both photographs were enlarged to fill a
+screen, so a larger original from the photographer would look sharper.
+
 Three **design concepts** sit beside them, labelled "Concept image": the burgundy stage with the
 logo on its backdrop (also the arched photo on the weddings page), the pearl-and-candlelight mood
 board and the candlelit courtyard. When a concept is built and photographed, replace the file and set

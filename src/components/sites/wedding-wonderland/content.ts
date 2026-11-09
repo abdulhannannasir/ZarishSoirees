@@ -149,12 +149,14 @@ export const SECTIONS: readonly Section[] = [
     photo: {
       // The stage fills the middle of a wide frame. Leave the top third relatively clear:
       // the header and the section dots sit there.
-      src: "/images/bespoke-stage.jpg",
-      // Portrait crop: the backdrop's centre piece, as tall as possible.
-      mobileSrc: "/images/bespoke-stage-mobile.jpg",
-      alt: "Ceremony stage with an arch of white roses and floor-length ivory drapes",
-      focus: "50% 45%",
-      brief: "Rose-covered arch against ivory silk drapes, architectural focal point, centred",
+      // The studio's burgundy stage (a design concept, with the brand's logo on the backdrop).
+      // Cropped so the logo sits in the upper part of the frame, clear of the copy.
+      src: "/images/scene-burgundy-stage.jpg",
+      // Portrait crop: the logo in the upper third, the sofa and roses below it.
+      mobileSrc: "/images/scene-burgundy-stage-mobile.jpg",
+      alt: "A white sofa on a stage between banks of pink and burgundy roses, under velvet swags, crystal strands and a gold chandelier, with The Wed Theory logo on the backdrop",
+      focus: "50% 50%",
+      brief: "Burgundy velvet stage with crystal strands, a gold chandelier and roses, logo on the backdrop",
     },
     swatches: [
       { name: "Silk", value: "#f1e9dc" },
@@ -224,10 +226,14 @@ export const SECTIONS: readonly Section[] = [
     photo: {
       // Dark, moody and wide. Light sources can be in the top half: the dark lower part keeps the
       // text readable without any extra darkening.
-      src: "/images/lighting-ambience.jpg",
-      alt: "Reception hall with a crystal chandelier and a canopy of warm fairy lights",
-      focus: "50% 35%",
-      brief: "Crystal chandelier, fairy-light canopy and candelabras over an ivory-draped reception hall",
+      // A photograph from one of the studio's own receptions, with the caption that was printed
+      // on it removed: a gilded crystal chandelier against burgundy velvet.
+      src: "/images/scene-chandelier.jpg",
+      // Portrait crop: the chandelier above, the velvet and florals below for the copy to sit on.
+      mobileSrc: "/images/scene-chandelier-mobile.jpg",
+      alt: "A gilded crystal chandelier glowing against burgundy velvet drapes, above deep red and marigold florals",
+      focus: "55% 45%",
+      brief: "Gilded crystal chandelier with candle bulbs against burgundy velvet drapes",
     },
     swatches: [
       { name: "Candlelight", value: "#e9c88f" },
