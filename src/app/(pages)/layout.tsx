@@ -3,6 +3,7 @@ import { SiteFooter } from "@/components/sites/twt/site-footer";
 import { SiteHeader } from "@/components/sites/twt/site-header";
 import { SkipLink } from "@/components/sites/twt/skip-link";
 import { PointerEffects } from "@/components/ui/pointer-effects";
+import { ScrollMotion } from "@/components/ui/scroll-motion";
 
 /**
  * Shared frame of the inner pages (services, portfolio, about, contact, the quiz): skip link, header,
@@ -24,6 +25,7 @@ export default function PagesLayout({
       <SiteFooter />
       <InstagramButton />
       <PointerEffects />
+      <ScrollMotion />
     </div>
   );
 }

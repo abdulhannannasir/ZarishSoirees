@@ -233,6 +233,20 @@
   html:has(.twt-page) {
     scroll-behavior: smooth;
   }
+  /* Lenis (scroll-motion.tsx) does the smoothing itself, so the browser's own must step aside. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  html.lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-stopped {
+    overflow: clip;
+  }
+  [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
   @media (prefers-reduced-motion: reduce) {
     html:has(.twt-page) {
       scroll-behavior: auto;
@@ -276,6 +290,40 @@
   margin: -10px 0 0 -10px;
   background-color: rgb(255 255 255 / 0.14);
 }
+/* Over a photo or card marked data-cursor: a soft champagne disc that names what a click does. */
+.twt-cursor[data-label] {
+  width: 84px;
+  height: 84px;
+  margin: -24px 0 0 -24px;
+  border-color: transparent;
+  background-color: rgb(216 195 154 / 0.92);
+  mix-blend-mode: normal;
+}
+.twt-cursor[data-visible][data-label] {
+  opacity: 1;
+}
+.twt-cursor::after {
+  content: attr(data-label);
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-jost), "Jost", ui-sans-serif, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #2b2418;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.25s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.twt-cursor[data-label]::after {
+  opacity: 1;
+  transform: none;
+}
 .twt-cursor[data-pressed] {
   width: 28px;
   height: 28px;
@@ -303,6 +351,29 @@
     transition:
       opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms),
       transform 1000ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+  }
+}
+
+/* The arch showcase (arch-showcase.tsx): the photo on show drifts slowly in, like a held breath. */
+@media (prefers-reduced-motion: no-preference) {
+  .arch-slide[data-active] img {
+    animation: arch-drift 7s ease-out both;
+  }
+}
+@keyframes arch-drift {
+  from {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* Parallax layers (scroll-motion.tsx) start slightly enlarged, so drifting never shows an edge. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-parallax] {
+    transform: scale(1.16);
+    will-change: transform;
   }
 }
 

@@ -718,6 +718,14 @@ export const isServiceSlug = (value: unknown): value is ServiceSlug =>
   typeof value === "string" && (SERVICE_SLUGS as readonly string[]).includes(value);
 
 /** The services overview page, and the labels the service pages share. */
+/** The arched picture beside the services page's title: one photograph per service. */
+export const SERVICES_SHOWCASE = SERVICE_SLUGS.map((slug) => ({
+  src: SERVICE_PAGES[slug].hero.src,
+  alt: SERVICE_PAGES[slug].hero.alt,
+  label: SERVICE_PAGES[slug].name,
+  focus: SERVICE_PAGES[slug].hero.focus,
+}));
+
 export const SERVICES_PAGE = {
   path: "/services",
   title: "Services",

@@ -392,6 +392,34 @@ export const SIGNATURE = {
     [WORK.burgundyEntrance, WORK.chandelier],
     [WORK.burgundyFlorals, WORK.roseWalkway],
   ],
+  /** Shown under the section where it is a preview (the services page), leading to the portfolio. */
+  more: { label: "See the full portfolio", href: "/portfolio" },
+} as const;
+
+/**
+ * The arched pictures beside the titles of the portfolio and contact pages (arch-showcase.tsx).
+ * They cross-fade in this order; `label` is the caption. The services page builds its own from
+ * the four services (services-content.ts).
+ */
+const showcaseOf = (picture: WorkPicture, focus = "50% 50%") => ({
+  src: picture.src,
+  alt: picture.alt,
+  label: picture.title,
+  focus,
+});
+
+export const INTRO_SHOWCASE = {
+  portfolio: [
+    showcaseOf(WORK.burgundyEntrance),
+    showcaseOf(WORK.chandelier, "55% 40%"),
+    showcaseOf(WORK.roseWalkway),
+    showcaseOf(WORK.burgundyFlorals),
+  ],
+  contact: [
+    showcaseOf(WORK.courtyard, "50% 60%"),
+    showcaseOf(WORK.burgundyStage, "50% 45%"),
+    showcaseOf(WORK.chandelier, "55% 40%"),
+  ],
 } as const;
 
 export const ABOUT = {

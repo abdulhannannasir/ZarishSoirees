@@ -143,6 +143,7 @@ export function ServiceCards({ exclude }: { exclude?: ServiceSlug }) {
           <Reveal as="li" key={slug} delay={index * 120} immediate={!compact && index === 0}>
             <Link
               href={serviceHref(slug)}
+              data-cursor="Explore"
               className="group flex h-full flex-col outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2 focus-visible:ring-offset-ivory"
             >
               <span

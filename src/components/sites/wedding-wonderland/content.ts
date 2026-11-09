@@ -105,8 +105,13 @@ export const HERO = {
 export const UI = {
   scrollCta: "Scroll to explore",
   home: "Home",
-  /** The header button (where the moodboard used to be) that opens the portfolio page. */
-  portfolio: { label: "Portfolio", href: "/portfolio" },
+  /**
+   * The header's main button (where the moodboard used to be): the services page, which leads on
+   * to the portfolio. Contact and Instagram sit beside it (on phones, in the bottom-right corner).
+   */
+  explore: { label: "Explore", href: "/services", ariaLabel: "Explore our services and portfolio" },
+  contact: { label: "Contact", href: "/contact" },
+  instagram: { label: "Instagram", ariaLabel: "The Wed Theory on Instagram (opens in a new tab)" },
   sectionNavLabel: "Sections",
   soundOn: "Turn sound on",
   soundOff: "Mute sound",

@@ -59,6 +59,22 @@ body:has(.wl[data-phase="intro"]) {
   overscroll-behavior: contain;
 }
 
+/*
+ * The mouse's position, -1..1 across the screen, written by wonderland.tsx onto each layer marked
+ * `.wl-pointer`. Not inherited, so a frame restyles those few layers and never the blooms inside.
+ */
+@property --mx {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --my {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
 .wl {
   --wl-ease-in: cubic-bezier(0.7, 0, 0.84, 0);
   --wl-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -269,23 +285,32 @@ body:has(.wl[data-phase="intro"]) {
 /* Parallax: each layer reads the section's `--p` at a different depth. */
 .wl-photo {
   transform-origin: 50% 55%;
-  transform: translate3d(0, calc(var(--p) * -4%), 0) scale(calc(1.08 + var(--p) * 0.14));
+  transform: translate3d(calc(var(--mx) * -16px), calc(var(--p) * -4% + var(--my) * -10px), 0)
+    scale(calc(1.08 + var(--p) * 0.14));
   will-change: transform;
 }
 
 .wl-fg {
-  transform: translate3d(0, calc(var(--p) * -90px), 0) rotate(calc(var(--p) * 6deg));
+  transform: translate3d(calc(var(--mx) * 22px), calc(var(--p) * -90px + var(--my) * 14px), 0)
+    rotate(calc(var(--p) * 6deg));
   filter: drop-shadow(0 10px 18px rgba(var(--wl-umber-rgb), 0.5));
   will-change: transform;
 }
 
 .wl-fg-deep {
-  transform: translate3d(0, calc(var(--p) * -220px), 0) scale(calc(1 + var(--p) * 0.18))
+  transform: translate3d(calc(var(--mx) * 38px), calc(var(--p) * -220px + var(--my) * 24px), 0)
+    scale(calc(1 + var(--p) * 0.18))
     rotate(calc(var(--p) * -8deg));
 }
 
 .wl-copy {
-  transform: translate3d(0, calc(var(--p) * -48px), 0);
+  transform: translate3d(calc(var(--mx) * 6px), calc(var(--p) * -48px + var(--my) * 4px), 0);
+}
+
+/* The hero's sheer drapes drift against the mouse, like a breath of air behind the logo. */
+.wl-hero-photo {
+  transform: translate3d(calc(var(--mx) * -14px), calc(var(--my) * -10px), 0) scale(1.05);
+  will-change: transform;
 }
 
 /*
@@ -370,7 +395,8 @@ body:has(.wl[data-phase="intro"]) {
 /* The portrait drifts and zooms a little less than the showpiece photos do. */
 .wl-portrait-photo {
   transform-origin: 50% 45%;
-  transform: translate3d(0, calc(var(--p) * -2.5%), 0) scale(calc(1.03 + var(--p) * 0.07));
+  transform: translate3d(calc(var(--mx) * -10px), calc(var(--p) * -2.5% + var(--my) * -8px), 0)
+    scale(calc(1.03 + var(--p) * 0.07));
   will-change: transform;
 }
 
@@ -423,12 +449,38 @@ body:has(.wl[data-phase="intro"]) {
   transform: translateX(130%);
 }
 
+/*
+ * The header's Explore button: a soft champagne ring breathes out of it every few seconds. It is a
+ * box-shadow, so it is not clipped by the button (whose sheen needs overflow: hidden).
+ */
+.wl-halo {
+  animation: wl-halo 3.4s ease-out 1.5s infinite;
+}
+
+@keyframes wl-halo {
+  0% {
+    box-shadow:
+      0 12px 34px -10px rgba(var(--wl-champagne-rgb), 0.55),
+      0 0 0 0 rgba(var(--wl-champagne-rgb), 0.7),
+      inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  }
+  70%,
+  100% {
+    box-shadow:
+      0 12px 34px -10px rgba(var(--wl-champagne-rgb), 0.55),
+      0 0 0 14px rgba(var(--wl-champagne-rgb), 0),
+      inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  }
+}
+
+
 @media (prefers-reduced-motion: reduce) {
   .wl-float,
   .wl-swing,
   .wl-cutout,
   .wl-intro-item,
   .wl-nudge,
+  .wl-halo,
   .wl-scene[data-state="active"] .wl-copy > * {
     animation: none;
   }

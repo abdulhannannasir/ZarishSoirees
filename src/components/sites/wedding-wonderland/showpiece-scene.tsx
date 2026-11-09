@@ -26,7 +26,7 @@ export function ShowpieceScene({
   return (
     <>
       {/* PHOTO: landscape 16:9 (min 2880x1620), optional portrait 3:5 for phones. See content.ts. */}
-      <div className="wl-photo absolute inset-0">
+      <div className="wl-photo wl-pointer absolute inset-0">
         <Photo photo={section.photo} priority={priority} />
       </div>
 
@@ -36,17 +36,17 @@ export function ShowpieceScene({
       {FOREGROUND_BLOOMS && (
         <div className="pointer-events-none absolute inset-0" aria-hidden="true">
           {/* Sits below the header row so it never hides the Home button. */}
-          <div className="wl-fg absolute -left-[5%] top-[14%] aspect-square w-[clamp(90px,12vw,170px)]">
+          <div className="wl-fg wl-pointer absolute -left-[5%] top-[14%] aspect-square w-[clamp(90px,12vw,170px)]">
             <Cluster seed={section.bloomSeed} blooms={2} />
           </div>
-          <div className="wl-fg wl-fg-deep absolute -bottom-[6%] -right-[4%] aspect-square w-[clamp(130px,19vw,260px)]">
+          <div className="wl-fg wl-fg-deep wl-pointer absolute -bottom-[6%] -right-[4%] aspect-square w-[clamp(130px,19vw,260px)]">
             <Cluster seed={section.bloomSeed + 1} blooms={3} />
           </div>
         </div>
       )}
 
       {/* Copy: bottom-left. Each line rises in turn when the section becomes active. */}
-      <div className="wl-copy absolute bottom-[clamp(96px,17vh,180px)] left-[clamp(20px,5vw,72px)] right-[clamp(20px,5vw,72px)] max-w-2xl [text-shadow:0_2px_28px_rgba(23,17,10,0.5)]">
+      <div className="wl-copy wl-pointer absolute bottom-[clamp(96px,17vh,180px)] left-[clamp(20px,5vw,72px)] right-[clamp(20px,5vw,72px)] max-w-2xl [text-shadow:0_2px_28px_rgba(23,17,10,0.5)]">
         <p
           className="font-label text-[12px] font-normal uppercase tracking-[0.22em] text-[var(--wl-ivory)]/85"
           style={step(0)}

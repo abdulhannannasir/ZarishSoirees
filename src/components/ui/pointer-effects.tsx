@@ -17,7 +17,9 @@ const MAGNET_PULL = 0.26;
  * - a thin ring that trails the pointer and swells over anything clickable. The normal cursor is
  *   never hidden or replaced, the ring ignores clicks, and it blends with whatever is beneath it, so
  *   it can never cover text or get in the way;
- * - buttons marked `data-magnetic` lean a few pixels toward the pointer.
+ * - buttons marked `data-magnetic` lean a few pixels toward the pointer;
+ * - over anything marked `data-cursor="View"` (photos that open, cards that lead somewhere) the
+ *   ring grows into a soft champagne disc that says so.
  *
  * It renders nothing: it adds and removes its own element, listeners and styles.
  */
@@ -38,14 +40,20 @@ export function PointerEffects() {
     let y = targetY;
     let rafId = 0;
     let magnet: HTMLElement | null = null;
+    let last = 0;
 
-    const frame = () => {
+    const frame = (now: number) => {
       rafId = 0;
-      x += (targetX - x) * 0.2;
-      y += (targetY - y) * 0.2;
+      // Time-based easing, so the ring trails the same on a 60 Hz and a 120 Hz screen.
+      const dt = last ? Math.min(64, now - last) : 16;
+      last = now;
+      const follow = 1 - Math.exp(-dt / 70);
+      x += (targetX - x) * follow;
+      y += (targetY - y) * follow;
       ring.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       // Keep going until the ring has caught up with the pointer.
       if (Math.abs(targetX - x) > 0.3 || Math.abs(targetY - y) > 0.3) rafId = requestAnimationFrame(frame);
+      else last = 0;
     };
     const wake = () => {
       if (!rafId) rafId = requestAnimationFrame(frame);
@@ -76,6 +84,9 @@ export function PointerEffects() {
       if (event.pointerType !== "mouse") return;
       const target = event.target as HTMLElement;
       if (target.closest(INTERACTIVE)) ring.dataset.active = "";
+      const label = target.closest<HTMLElement>("[data-cursor]")?.dataset.cursor;
+      if (label) ring.dataset.label = label;
+      else delete ring.dataset.label;
       const next = target.closest<HTMLElement>("[data-magnetic]");
       if (next !== magnet) {
         if (magnet) release(magnet);
@@ -85,6 +96,7 @@ export function PointerEffects() {
     const onOut = (event: PointerEvent) => {
       const related = event.relatedTarget as HTMLElement | null;
       if (!related?.closest?.(INTERACTIVE)) delete ring.dataset.active;
+      if (!related?.closest?.("[data-cursor]")) delete ring.dataset.label;
       if (magnet && !related?.closest?.("[data-magnetic]")) {
         release(magnet);
         magnet = null;

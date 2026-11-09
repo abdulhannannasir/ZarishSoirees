@@ -84,6 +84,7 @@ export function PortfolioGallery({ items, filters = false, footer }: PortfolioGa
             >
               <button
                 type="button"
+                data-cursor="View"
                 onClick={() => setOpen(position)}
                 aria-haspopup="dialog"
                 className="group block w-full text-left outline-none"

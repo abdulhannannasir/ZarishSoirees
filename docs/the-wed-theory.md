@@ -13,7 +13,7 @@ The site has two parts:
 
 | Address | What is on it |
 | --- | --- |
-| `/services` | The four celebrations as photo cards: Weddings, Birthdays, Social Events, Corporate Events. |
+| `/services` | The four celebrations as photo cards (Weddings, Birthdays, Social Events, Corporate Events), then the portfolio's "Created by The Wed Theory" with a link to the full portfolio. The front page's Explore button leads here. |
 | `/services/weddings`, `/birthdays`, `/social-events`, `/corporate-events` | One page per celebration: introduction, what we plan, three highlights, how we work, a gallery, the other services and a call to action (WhatsApp, or the enquiry form with the event type already chosen: `/contact?service=birthdays`). |
 | `/portfolio` | The five collections (grand entrances, bespoke stages, floral architecture, table settings, lighting), then a gallery of every picture on the site with category filters and a full-screen viewer. |
 | `/about` | Our approach, how we work (four steps), what we plan, and a pile of photographs you can drag aside. |
@@ -24,6 +24,25 @@ The site has two parts:
 Also included: a designed 404 page, `sitemap.xml`, `robots.txt`, a web app manifest, favicon and app
 icons, share cards for every page (`public/share/`), and structured data for search engines on the
 front page and the service pages.
+
+## Motion and the cursor
+
+All of it switches off for visitors who prefer reduced motion, and none of it is needed to use the site.
+
+- **Front page.** The scenes follow the wheel with a time-based glide (the same on 60 Hz and 120 Hz
+  screens), mouse-wheel steps are evened out between browsers, and after a scene changes the wheel
+  is held until the trackpad's leftover momentum has died away, so one swipe moves one scene. With a
+  mouse, the photographs drift a little against the pointer and the blooms and words with it
+  (`--mx` / `--my` in `wonderland.css`). The header's gold **Explore** button opens the services page;
+  Contact and Instagram sit beside it (on phones, in the bottom-right corner).
+- **Inner pages.** Smooth, inertial scrolling for the wheel and trackpad (Lenis, in
+  `src/components/ui/scroll-motion.tsx`; touch keeps native scrolling), and photos marked
+  `data-parallax` drift against the scroll.
+- **Cursor.** A ring trails a real mouse everywhere; over anything marked `data-cursor="View"` (or
+  "Explore") it becomes a champagne disc with that word (`pointer-effects.tsx`).
+- **The arch beside a page title** (`arch-showcase.tsx`): photographs cross-fade and drift in the
+  brand's arch, with a turning seal. Its pictures are `SERVICES_SHOWCASE` (services-content.ts) and
+  `INTRO_SHOWCASE` (content.ts).
 
 ## Where things live
 

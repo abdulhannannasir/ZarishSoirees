@@ -1,4 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/ui/reveal";
 import { cn } from "@/lib/utils";
 import { SIGNATURE, type WorkPicture } from "./content";
@@ -33,14 +35,17 @@ function Tile({
           } as React.CSSProperties
         }
       >
-        <Image
-          src={picture.src}
-          alt={picture.alt}
-          fill
-          sizes={SIZES[span]}
-          loading={eager ? "eager" : undefined}
-          className="object-cover transition-transform duration-[1400ms] ease-out motion-safe:group-hover:scale-[1.04]"
-        />
+        {/* The photo drifts against the scroll (data-parallax, see scroll-motion.tsx). */}
+        <div data-parallax="0.07" className="absolute inset-0">
+          <Image
+            src={picture.src}
+            alt={picture.alt}
+            fill
+            sizes={SIZES[span]}
+            loading={eager ? "eager" : undefined}
+            className="object-cover transition-transform duration-[1400ms] ease-out motion-safe:group-hover:scale-[1.04]"
+          />
+        </div>
       </div>
       <figcaption className="mt-4">
         <p className="font-ui text-[10px] leading-none font-medium tracking-[0.22em] text-ink-soft uppercase">
@@ -58,7 +63,7 @@ function Tile({
  * The portfolio's opening section: photographs of events the studio created (words and pictures:
  * `SIGNATURE` and `WORK` in content.ts). The concept collections and the full gallery follow it.
  */
-export function SignatureWork() {
+export function SignatureWork({ withLink = false }: { withLink?: boolean }) {
   return (
     <section
       aria-labelledby="signature-heading"
@@ -102,6 +107,21 @@ export function SignatureWork() {
           );
         })}
       </div>
+
+      {withLink && (
+        <Link
+          href={SIGNATURE.more.href}
+          data-magnetic
+          className="group tap-target mt-12 inline-flex items-center gap-3 rounded-full border border-ink/30 px-7 py-3.5 font-ui text-[13px] tracking-[0.12em] text-ink uppercase transition-colors duration-300 outline-none hover:border-forest hover:bg-forest hover:text-cream focus-visible:ring-2 focus-visible:ring-forest/50 lg:mt-16"
+        >
+          {SIGNATURE.more.label}
+          <ArrowRight
+            className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+            strokeWidth={1.3}
+            aria-hidden="true"
+          />
+        </Link>
+      )}
     </section>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ClosingCta } from "@/components/sites/twt/closing-cta";
-import { PORTFOLIO } from "@/components/sites/twt/content";
+import { ArchShowcase } from "@/components/sites/twt/arch-showcase";
+import { INTRO_SHOWCASE, PORTFOLIO } from "@/components/sites/twt/content";
 import { PageIntro } from "@/components/sites/twt/page-intro";
 import { PortfolioBrowse } from "@/components/sites/twt/portfolio-browse";
 import { PortfolioGrid } from "@/components/sites/twt/portfolio-grid";
@@ -22,7 +23,9 @@ export default function PortfolioPage() {
         eyebrow={PORTFOLIO.eyebrow}
         headline={PORTFOLIO.headline}
         intro={PORTFOLIO.intro}
-      />
+      >
+        <ArchShowcase slides={INTRO_SHOWCASE.portfolio} />
+      </PageIntro>
       <SignatureWork />
       <PortfolioGrid />
       <PortfolioBrowse />
